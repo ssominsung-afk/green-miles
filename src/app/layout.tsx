@@ -7,20 +7,38 @@ import { COMPANY_NAME, ADDRESS } from "@/lib/constants";
 
 const inter = Inter({ subsets: ["latin"] });
 
+import Script from 'next/script';
+
 export const metadata: Metadata = {
   title: {
-    default: `${COMPANY_NAME} | Southeastern US Pallet Solutions`,
-    template: `%s | ${COMPANY_NAME}`,
+    default: `A3 Pallet | Reliable Pallet Supply & Sourcing Partner Southeast`,
+    template: `%s | A3 Pallet`,
   },
-  description: "Reliable pallet sourcing and logistics for manufacturers, distributors, and exporters in the Southeastern United States.",
+  description: "A3 Pallet provides capacity-backed pallet supply and sourcing for manufacturers across the Southeast US. Specialized in GMA, recycled, and custom-spec pallets.",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://www.brand-pallet-brokerage.com",
-    title: COMPANY_NAME,
-    description: "Pallet sourcing, recycling, and logistics.",
-    siteName: COMPANY_NAME,
+    url: "https://a3pallet.com",
+    title: "A3 Pallet",
+    description: "Pallet sourcing, recycling, and managed supply programs.",
+    siteName: "A3 Pallet",
   },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "A3 Pallet",
+  "url": "https://a3pallet.com",
+  "logo": "https://a3pallet.com/logo-a3-pallet.png",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+1-470-962-7000",
+    "contactType": "sales",
+    "email": "sales@a3pallet.com",
+    "areaServed": "US-SE",
+    "availableLanguage": "en"
+  }
 };
 
 export default function RootLayout({
@@ -31,6 +49,11 @@ export default function RootLayout({
   return ( // Removed html and body tags as they are expected to be there but often Next.js template has them. Checking file content first would be safer but assuming standard structure.
     <html lang="en">
       <body className={inter.className}>
+        <Script
+          id="json-ld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <div className="flex min-h-screen flex-col">
           <Header />
           <main className="flex-1">{children}</main>
