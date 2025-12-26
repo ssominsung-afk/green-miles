@@ -208,14 +208,9 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/contact">
               <Button size="lg" className="font-bold px-12 py-8 text-lg">
-                Get Pricing
+                Get Your 1-Hour Quote
               </Button>
             </Link>
-            <a href={`tel:${PHONE_NUMBER.replace(/\D/g, '')}`} className="sm:inline-flex hidden">
-              <Button size="lg" variant="outline" className="font-bold px-12 py-8 text-lg bg-white">
-                Call {PHONE_NUMBER}
-              </Button>
-            </a>
           </div>
         </div>
       </section>

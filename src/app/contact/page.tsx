@@ -34,15 +34,12 @@ export default function ContactPage() {
                             </div>
                         </div>
 
-                        <div className="flex items-start gap-4 p-4 rounded-xl border bg-muted/20">
-                            <Phone className="h-6 w-6 text-primary mt-1" />
-                            <div>
-                                <h3 className="font-bold">Operations Support</h3>
-                                <p className="text-sm text-muted-foreground mb-2">Business Hours: Mon-Fri, 7am - 4:30pm EST</p>
-                                <a href={`tel:${PHONE_NUMBER.replace(/\D/g, '')}`} className="text-primary font-semibold hover:underline">
-                                    {PHONE_NUMBER}
-                                </a>
-                            </div>
+                        <div className="pt-4 border-t">
+                            <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider font-semibold">Operations Support</p>
+                            <p className="text-sm text-muted-foreground mb-1">Mon-Fri, 7am - 4:30pm EST</p>
+                            <a href={`tel:${PHONE_NUMBER.replace(/\D/g, '')}`} className="text-sm text-muted-foreground hover:text-primary underline decoration-muted-foreground/30 underline-offset-4">
+                                Tel: {PHONE_NUMBER}
+                            </a>
                         </div>
 
                         <div className="flex items-start gap-4 p-4 rounded-xl border bg-muted/20">

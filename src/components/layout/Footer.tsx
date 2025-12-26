@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Truck } from 'lucide-react';
-import { COMPANY_NAME } from '@/lib/constants';
+import { COMPANY_NAME, PHONE_NUMBER } from '@/lib/constants';
 
 export default function Footer() {
     return (
@@ -50,8 +50,11 @@ export default function Footer() {
                         </ul>
                     </div>
                 </div>
-                <div className="mt-10 border-t pt-6 text-center text-sm text-muted-foreground">
-                    &copy; {new Date().getFullYear()} {COMPANY_NAME}. All rights reserved.
+                <div className="mt-10 border-t pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
+                    <p>&copy; {new Date().getFullYear()} {COMPANY_NAME}. All rights reserved.</p>
+                    <a href={`tel:${PHONE_NUMBER.replace(/\D/g, '')}`} className="hover:text-primary">
+                        {PHONE_NUMBER}
+                    </a>
                 </div>
             </div>
         </footer>
