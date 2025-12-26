@@ -11,11 +11,11 @@ export default function Footer() {
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-2">
                             <Image
-                                src="/logo-green-miles-v2.png"
+                                src="/logo-a3-pallet.png"
                                 alt={COMPANY_NAME}
-                                width={140}
-                                height={45}
-                                className="h-10 w-auto object-contain"
+                                width={180}
+                                height={55}
+                                className="h-12 w-auto object-contain"
                                 unoptimized
                             />
                         </div>
