@@ -31,6 +31,12 @@ const jsonLd = {
   "name": "A3 Pallet",
   "url": "https://a3pallet.com",
   "logo": "https://a3pallet.com/logo-a3-pallet.png",
+  "description": "A3 Pallet provides capacity-backed pallet supply and sourcing for manufacturers across the Southeast US.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressRegion": "GA",
+    "addressCountry": "US"
+  },
   "contactPoint": {
     "@type": "ContactPoint",
     "telephone": "+1-470-962-7000",
@@ -38,6 +44,28 @@ const jsonLd = {
     "email": "sales@a3pallet.com",
     "areaServed": "US-SE",
     "availableLanguage": "en"
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Pallet Supply Services",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Standard Pallet Supply",
+          "description": "New and recycled GMA 48x40 pallets fulfilled through a vetted partner network."
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Custom Pallet Design",
+          "description": "Spec-driven custom pallets engineered for unique load requirements."
+        }
+      }
+    ]
   }
 };
 

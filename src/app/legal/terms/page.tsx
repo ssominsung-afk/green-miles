@@ -8,7 +8,7 @@ export default function TermsOfService() {
 
             <section className="mb-8">
                 <h2 className="text-2xl font-semibold mb-4">1. Agreement to Terms</h2>
-                <p>By accessing our website at [Your Domain], you are agreeing to be bound by these terms of service, all applicable laws and regulations, and agree that you are responsible for compliance with any applicable local laws.</p>
+                <p>By accessing our website at https://www.a3pallet.com/, you are agreeing to be bound by these terms of service, all applicable laws and regulations, and agree that you are responsible for compliance with any applicable local laws.</p>
             </section>
 
             <section className="mb-8">
@@ -28,7 +28,7 @@ export default function TermsOfService() {
 
             <section className="mb-8">
                 <h2 className="text-2xl font-semibold mb-4">5. Governing Law</h2>
-                <p>These terms and conditions are governed by and construed in accordance with the laws and you irrevocably submit to the exclusive jurisdiction of the courts in that State or location.</p>
+                <p>These terms and conditions are governed by and construed in accordance with the laws of [State of Georgia] and you irrevocably submit to the exclusive jurisdiction of the courts in that State or location.</p>
             </section>
         </div>
     );

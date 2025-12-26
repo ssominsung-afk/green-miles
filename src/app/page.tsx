@@ -140,7 +140,7 @@ export default function Home() {
             <div className="flex flex-col items-center text-center group">
               <div className="bg-secondary text-secondary-foreground w-12 h-12 rounded-full flex items-center justify-center mb-6 font-bold text-xl group-hover:scale-110 transition-transform">1</div>
               <h3 className="font-bold text-lg mb-2">Specs + Volume</h3>
-              <p className="text-primary-foreground/80 text-sm leading-relaxed">We audit your current specs and volume needs to ensure perfect alignment with our capacity.</p>
+              <p className="text-primary-foreground/80 text-sm leading-relaxed">We audit your current specs and volume requirements to ensure perfect alignment with our partner capacity.</p>
             </div>
             <div className="flex flex-col items-center text-center group">
               <div className="bg-secondary text-secondary-foreground w-12 h-12 rounded-full flex items-center justify-center mb-6 font-bold text-xl group-hover:scale-110 transition-transform">2</div>
@@ -204,7 +204,7 @@ export default function Home() {
       <section className="py-24 bg-muted border-y">
         <div className="container mx-auto px-4 md:px-6 text-center">
           <h2 className="text-4xl font-bold mb-6 tracking-tight text-primary">Minimize Production Downtime Today</h2>
-          <p className="mb-10 text-muted-foreground text-xl max-w-2xl mx-auto">Join the manufacturers and 3PLs relying on {COMPANY_NAME} for accountable, capacity-backed pallet supply.</p>
+          <p className="mb-10 text-muted-foreground text-xl max-w-2xl mx-auto">Join the manufacturers and 3PLs relying on {COMPANY_NAME} for accountable, partner-backed pallet supply programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/contact">
               <Button size="lg" className="font-bold px-12 py-8 text-lg">
