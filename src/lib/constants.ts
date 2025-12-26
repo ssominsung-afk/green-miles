@@ -3,7 +3,7 @@ export const COMPANY_EMAILS = {
     SALES: "sales@a3pallet.com",
     SUPPORT: "sales@a3pallet.com"
 };
-export const PHONE_NUMBER = "(xxx) xxx-xxxx";
+export const PHONE_NUMBER = "(470) 962-7000";
 export const ADDRESS = "Serving the Southeastern United States";
 
 export const NAV_LINKS = [
