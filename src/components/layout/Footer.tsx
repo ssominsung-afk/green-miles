@@ -13,9 +13,9 @@ export default function Footer() {
                             <Image
                                 src="/logo-a3-pallet.png"
                                 alt={COMPANY_NAME}
-                                width={180}
-                                height={55}
-                                className="h-12 w-auto object-contain"
+                                width={240}
+                                height={80}
+                                className="h-16 w-auto object-contain"
                                 unoptimized
                             />
                         </div>

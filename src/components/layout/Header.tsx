@@ -9,15 +9,15 @@ import Image from 'next/image';
 export default function Header() {
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container mx-auto flex h-16 items-center justify-between px-4">
+            <div className="container mx-auto flex h-20 md:h-24 items-center justify-between px-4">
                 <div className="flex items-center gap-2">
                     <Link href="/" className="flex items-center space-x-2">
                         <Image
                             src="/logo-a3-pallet.png"
                             alt={COMPANY_NAME}
-                            width={220}
-                            height={60}
-                            className="h-14 w-auto object-contain"
+                            width={300}
+                            height={80}
+                            className="h-16 md:h-20 w-auto object-contain"
                             priority
                             unoptimized
                         />
