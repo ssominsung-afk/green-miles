@@ -45,8 +45,9 @@ export default function Footer() {
                     <div>
                         <h3 className="font-semibold mb-3">Legal</h3>
                         <ul className="space-y-2 text-sm text-muted-foreground">
-                            <li><Link href="/legal/privacy">Privacy Policy</Link></li>
-                            <li><Link href="/legal/terms">Terms of Service</Link></li>
+                            <li><Link href="/privacy">Privacy Policy</Link></li>
+                            <li><Link href="/terms">Terms of Service</Link></li>
+                            <li><Link href="/sms-optin-internal" className="text-[10px] opacity-70">SMS Opt-In</Link></li>
                         </ul>
                     </div>
                 </div>
