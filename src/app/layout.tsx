@@ -9,8 +9,8 @@ import GTMClickTracker from "@/components/analytics/GTMClickTracker";
 
 const inter = Inter({ subsets: ["latin"] });
 
-// ✅ GA4 Measurement ID (Vercel Environment Variables에 넣어둔 값 사용)
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+// ✅ GA4 Measurement ID
+const GA_ID = "G-N8P6KWL7LW";
 
 export const metadata: Metadata = {
   title: {
