@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { trackLead } from '@/lib/gtm';
 import { useState } from 'react';
 
 export function OrderRequestForm() {
@@ -45,6 +46,7 @@ export function OrderRequestForm() {
         try {
             await submitOrder(data);
             setSubmitStatus('success');
+            trackLead('quote');
             form.reset();
         } catch (error) {
             console.error(error);

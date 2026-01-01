@@ -16,6 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { trackLead } from '@/lib/gtm';
 import { useState } from 'react';
 
 export function CustomPalletForm() {
@@ -45,6 +46,7 @@ export function CustomPalletForm() {
         try {
             await submitCustomRequest(data);
             setSubmitStatus('success');
+            trackLead('quote');
             form.reset();
         } catch (error) {
             console.error(error);
