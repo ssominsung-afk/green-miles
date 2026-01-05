@@ -4,20 +4,17 @@ import Link from 'next/link';
 import { Package, Check, Truck, MapPin } from 'lucide-react';
 
 export const metadata = {
-    title: 'Atlanta Pallet Supply & Sourcing | Warehouse & 3PL Pallets | A3 Pallet',
-    description: 'Atlanta-based pallet supply and sourcing across major industrial corridors and the Southeast U.S. GMA, recycled, and custom pallet programs built for high-volume distribution.',
+    title: 'Atlanta Pallet Supply | GMA 48x40 & Custom | A3 Pallet',
+    description: 'Atlanta-based pallet supply across key logistics corridors. GMA 48x40, recycled, and custom pallets with confirmed availability by spec and volume.',
 };
 
 export default function PalletsPage() {
     return (
         <div className="container mx-auto py-16 px-4">
             <div className="text-center mb-16">
-                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4 text-primary">Atlanta-Based Pallet Supply & Sourcing</h1>
+                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4 text-primary">Atlanta Pallet Supply & Sourcing</h1>
                 <p className="text-muted-foreground text-lg max-w-3xl mx-auto mb-6">
-                    Capacity-backed pallet programs built for warehouse and distribution operations across Atlanta’s key logistics corridors. Serving the Southeast U.S. for multi-site and regional coverage.
-                </p>
-                <p className="text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                    We’re Atlanta-based and prioritize nearby routing along the metro’s primary industrial corridors. Tell us your spec, volume, and delivery window, and we’ll confirm availability and lead time.
+                    A3 Pallet is Atlanta-based and supports warehouse and distribution operations with reliable pallet programs. We prioritize Atlanta metro routing first, and expand coverage across the Southeast for multi-site needs.
                 </p>
             </div>
 

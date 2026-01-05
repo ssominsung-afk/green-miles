@@ -6,8 +6,8 @@ import { COMPANY_NAME, PHONE_NUMBER } from '@/lib/constants';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'A3 Pallet | Reliable Pallet Supply & Sourcing Partner Southeast',
-  description: 'Streamline your supply chain with A3 Pallet. Capacity-backed pallet sourcing, custom specs, and reliable fulfillment across the Southeast US. Get a quote in 1 hour.',
+  title: 'Atlanta Pallet Supply & Sourcing | Warehouse & 3PL Pallets | A3 Pallet',
+  description: 'Atlanta-based pallet supply and sourcing for warehouses, manufacturers, and 3PLs. GMA 48x40, recycled, and custom pallets—serving Atlanta metro logistics corridors and the Southeast.',
 };
 
 export default function Home() {
@@ -18,12 +18,29 @@ export default function Home() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col items-center space-y-4 text-center">
             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-              Your Accountable Partner in <span className="text-secondary font-bold">Pallet Supply & Sourcing</span>
+              Atlanta-Based <span className="text-secondary font-bold">Pallet Supply & Sourcing</span>
             </h1>
             <p className="mx-auto max-w-[700px] text-primary-foreground/90 md:text-xl">
-              Capacity-backed fulfillment for modern supply chains. We streamline your procurement through vetted manufacturing partners and professional logistics coordination across the Southeast.
+              Capacity-backed pallet programs for warehouses, manufacturers, and 3PLs across Atlanta’s key logistics corridors. Regional Southeast coverage available for multi-site needs.
             </p>
-            <div className="flex flex-col gap-2 min-[400px]:flex-row pt-4">
+
+            {/* Trust Block */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-8 text-sm font-medium">
+              <div className="flex items-center justify-center gap-2">
+                <CheckCircle className="h-4 w-4 text-secondary" />
+                <span>Atlanta-first routing & responsive communication</span>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <CheckCircle className="h-4 w-4 text-secondary" />
+                <span>GMA 48x40 + recycled + custom programs</span>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <CheckCircle className="h-4 w-4 text-secondary" />
+                <span>Quoted lead times confirmed by spec & volume</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 min-[400px]:flex-row pt-8">
               <Link href="/contact">
                 <Button size="lg" className="w-full min-[400px]:w-auto bg-primary text-primary-foreground hover:bg-primary/90 border-2 border-primary-foreground">
                   Request Your 1-Hour Quote
@@ -39,24 +56,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trust Strip */}
-      <section className="bg-muted py-8 border-b">
-        <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 text-center px-4">
-          <div>
-            <p className="text-3xl font-bold text-primary">Vetted</p>
-            <p className="text-sm font-medium text-muted-foreground">Partner Network</p>
-          </div>
-          <div>
-            <p className="text-3xl font-bold text-primary">1-Hour</p>
-            <p className="text-sm font-medium text-muted-foreground">Response Time</p>
-          </div>
-          <div>
-            <p className="text-3xl font-bold text-primary">Southeast</p>
-            <p className="text-sm font-medium text-muted-foreground">Regional Focus</p>
-          </div>
-          <div>
-            <p className="text-3xl font-bold text-primary">Accountable</p>
-            <p className="text-sm font-medium text-muted-foreground">Program Management</p>
+      {/* Corridor Links Section - Topic Cluster Strengthening */}
+      <section className="bg-muted py-12 border-b">
+        <div className="container mx-auto px-4">
+          <h2 className="text-xl font-bold text-center mb-8">Serving Atlanta Metro Logistics Corridors</h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {[
+              { name: 'I-85 North', href: '/service-areas/i-85-north' },
+              { name: 'Airport / I-85 South', href: '/service-areas/airport-i-85-south' },
+              { name: 'I-75 South', href: '/service-areas/i-75-south-henry' },
+              { name: 'I-20 West', href: '/service-areas/i-20-west' },
+              { name: 'I-20 East', href: '/service-areas/i-20-east' },
+            ].map((corridor) => (
+              <Link key={corridor.name} href={corridor.href} className="flex items-center justify-center p-4 bg-white rounded-lg border hover:border-primary hover:text-primary transition-colors text-center text-sm font-semibold">
+                {corridor.name}
+              </Link>
+            ))}
           </div>
         </div>
       </section>

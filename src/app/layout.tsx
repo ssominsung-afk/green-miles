@@ -31,48 +31,44 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "A3 Pallet",
-  url: "https://a3pallet.com",
-  logo: "https://a3pallet.com/logo-a3-pallet.png",
-  description:
-    "A3 Pallet provides capacity-backed pallet supply and sourcing for manufacturers across the Southeast US.",
-  address: {
+  "@type": "LocalBusiness",
+  "name": "A3 Pallet",
+  "url": "https://a3pallet.com",
+  "logo": "https://a3pallet.com/logo-a3-pallet.png",
+  "image": "https://a3pallet.com/logo-a3-pallet.png",
+  "description":
+    "Atlanta-based pallet supply and sourcing for warehouses, manufacturers, and 3PLs across the Southeast US.",
+  "telephone": "+1-470-962-7000",
+  "address": {
     "@type": "PostalAddress",
-    addressRegion: "GA",
-    addressCountry: "US",
+    "addressLocality": "Atlanta",
+    "addressRegion": "GA",
+    "addressCountry": "US"
   },
-  contactPoint: {
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 33.7490,
+    "longitude": -84.3880
+  },
+  "areaServed": [
+    { "@type": "City", "name": "Atlanta" },
+    { "@type": "City", "name": "Norcross" },
+    { "@type": "City", "name": "Buford" },
+    { "@type": "City", "name": "Braselton" },
+    { "@type": "City", "name": "McDonough" },
+    { "@type": "City", "name": "Locust Grove" },
+    { "@type": "City", "name": "Union City" },
+    { "@type": "City", "name": "Fairburn" },
+    { "@type": "City", "name": "Lithia Springs" },
+    { "@type": "City", "name": "Conyers" }
+  ],
+  "contactPoint": {
     "@type": "ContactPoint",
-    telephone: "+1-470-962-7000",
-    contactType: "sales",
-    email: "sales@a3pallet.com",
-    areaServed: "US-SE",
-    availableLanguage: "en",
-  },
-  hasOfferCatalog: {
-    "@type": "OfferCatalog",
-    name: "Pallet Supply Services",
-    itemListElement: [
-      {
-        "@type": "Offer",
-        itemOffered: {
-          "@type": "Service",
-          name: "Standard Pallet Supply",
-          description:
-            "New and recycled GMA 48x40 pallets fulfilled through a vetted partner network.",
-        },
-      },
-      {
-        "@type": "Offer",
-        itemOffered: {
-          "@type": "Service",
-          name: "Custom Pallet Design",
-          description: "Spec-driven custom pallets engineered for unique load requirements.",
-        },
-      },
-    ],
-  },
+    "telephone": "+1-470-962-7000",
+    "contactType": "sales",
+    "email": "sales@a3pallet.com",
+    "availableLanguage": "en"
+  }
 };
 
 export default function RootLayout({
