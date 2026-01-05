@@ -59,6 +59,12 @@ function doPost(e) {
 
     // 2. Append Data Record
     const fileSize = data.fileData ? Math.round(data.fileData.length * 0.75 / 1024) : 0;
+    let driveLink = "";
+    
+    if (data.fileData && data.fileName) {
+      driveLink = saveFileToDrive(data);
+    }
+
     const row = [
       timestamp, 
       data.name, 
@@ -72,7 +78,7 @@ function doPost(e) {
       data.deliveryMode || data.loadRating, 
       data.deliveryAddress || data.woodType, 
       data.notes,
-      data.fileName ? data.fileName + " (" + fileSize + " KB)" : ""
+      driveLink || (data.fileName ? data.fileName + " (Failed to upload)" : "")
     ];
     sheet.appendRow(row);
 
@@ -82,7 +88,7 @@ function doPost(e) {
     logSheet.appendRow([timestamp, "Order Received", formType, data.email]);
 
     // 4. Trigger Notifications
-    sendFinalNotifications(data, timestamp, fileSize);
+    sendFinalNotifications(data, timestamp, driveLink);
 
     return responseSuccess();
   } catch (err) {
@@ -93,44 +99,63 @@ function doPost(e) {
 }
 
 /**
+ * Saves base64 file to a dedicated Google Drive folder and returns the link.
+ */
+function saveFileToDrive(data) {
+  try {
+    const folderName = "A3_Website_Uploads";
+    let folder;
+    const folders = DriveApp.getFoldersByName(folderName);
+    
+    if (folders.hasNext()) {
+      folder = folders.next();
+    } else {
+      folder = DriveApp.createFolder(folderName);
+    }
+    
+    const contentType = data.fileType || "application/octet-stream";
+    const decoded = Utilities.base64Decode(data.fileData);
+    const blob = Utilities.newBlob(decoded, contentType, data.fileName);
+    const file = folder.createFile(blob);
+    
+    // Set view permissions so the sales team can see it
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    
+    return file.getUrl();
+  } catch (e) {
+    console.error("Drive Upload Error: " + e.toString());
+    return "";
+  }
+}
+
+/**
  * Core notification logic for Email and SMS.
  */
-function sendFinalNotifications(data, timestamp, fileSize) {
+function sendFinalNotifications(data, timestamp, driveLink) {
   const subject = `New Website Inquiry - ${data.company}`;
-  const body = `Details for ${data.formType}:\n\n` +
+  let body = `Details for ${data.formType}:\n\n` +
                `Customer: ${data.name}\n` +
                `Company: ${data.company}\n` +
                `Phone: ${data.phone}\n` +
                `Email: ${data.email}\n` +
                `ZIP: ${data.zip}\n` +
                `Quantity: ${data.quantity}\n` +
-               `Notes: ${data.notes || "N/A"}\n` +
-               `File Attachment: ${data.fileName ? "YES (" + data.fileName + ", " + fileSize + " KB)" : "NO"}\n\n` +
-               `Database: ${SpreadsheetApp.getActiveSpreadsheet().getUrl()}`;
+               `Notes: ${data.notes || "N/A"}\n`;
   
-  // 1. Send Email via GmailApp (Often more robust for attachments)
-  const myEmail = Session.getActiveUser().getEmail();
-  const options = {};
-  
-  if (data.fileData && data.fileName) {
-    try {
-      const blob = Utilities.newBlob(
-        Utilities.base64Decode(data.fileData),
-        data.fileType || "application/octet-stream",
-        data.fileName
-      );
-      options.attachments = [blob];
-    } catch (e) {
-      console.error("Attachment processing error: " + e.toString());
-      // Log error to debug sheet
-      SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.DEBUG).appendRow([new Date(), "ATTACHMENT_ERROR", e.toString()]);
-    }
+  if (driveLink) {
+    body += `\n--- ATTACHED DRAWING ---\nView File: ${driveLink}\n\n`;
+  } else if (data.fileName) {
+    body += `\n[!] File was attached (${data.fileName}) but failed to upload to Drive.\n\n`;
   }
 
+  body += `Database: ${SpreadsheetApp.getActiveSpreadsheet().getUrl()}`;
+  
+  // Send Email via MailApp (Simpler now without large attachments)
+  const myEmail = Session.getActiveUser().getEmail();
   try {
-    GmailApp.sendEmail(CONFIG.EMAILS[0], subject, body, options);
+    MailApp.sendEmail(CONFIG.EMAILS[0], subject, body);
     if (CONFIG.EMAILS[0] !== myEmail) {
-      GmailApp.sendEmail(myEmail, "Copy: " + subject, body, options);
+      MailApp.sendEmail(myEmail, "Copy: " + subject, body);
     }
   } catch (e) {
     console.error("Email Error: " + e.toString());
