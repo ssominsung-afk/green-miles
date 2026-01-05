@@ -52,7 +52,7 @@ function doPost(e) {
     // Header check
     if (sheet.getLastRow() === 0) {
       const headers = (formType === "CustomRequest") 
-        ? ["Timestamp", "Name", "Company", "Email", "Phone", "ZIP", "Dimensions", "Design", "Load", "Wood", "HT", "Qty", "Notes"]
+        ? ["Timestamp", "Name", "Company", "Email", "Phone", "ZIP", "Dimensions", "Design", "Load", "Wood", "HT", "Qty", "Notes", "File"]
         : ["Timestamp", "Name", "Company", "Email", "Phone", "ZIP", "Type", "Qty", "Freq", "Mode", "Addr", "Notes"];
       sheet.appendRow(headers);
     }
@@ -70,7 +70,8 @@ function doPost(e) {
       data.frequency || data.designType, 
       data.deliveryMode || data.loadRating, 
       data.deliveryAddress || data.woodType, 
-      data.notes
+      data.notes,
+      data.fileName || ""
     ];
     sheet.appendRow(row);
 

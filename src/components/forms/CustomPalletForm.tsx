@@ -21,6 +21,7 @@ import { useState } from 'react';
 
 export function CustomPalletForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isReadingFile, setIsReadingFile] = useState(false);
     const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
     const form = useForm<CustomRequestData>({
@@ -38,10 +39,17 @@ export function CustomPalletForm() {
             heatTreated: 'No',
             quantity: '',
             notes: '',
+            fileData: '',
+            fileName: '',
+            fileType: '',
         },
     });
 
     async function onSubmit(data: CustomRequestData) {
+        if (isReadingFile) {
+            alert("Please wait for the file to finish processing.");
+            return;
+        }
         setIsSubmitting(true);
         try {
             await submitCustomRequest(data);
@@ -259,17 +267,25 @@ export function CustomPalletForm() {
                                     e.target.value = "";
                                     return;
                                 }
+                                setIsReadingFile(true);
                                 const reader = new FileReader();
                                 reader.onloadend = () => {
                                     const base64String = (reader.result as string).split(',')[1];
                                     form.setValue('fileData', base64String);
                                     form.setValue('fileName', file.name);
                                     form.setValue('fileType', file.type);
+                                    setIsReadingFile(false);
+                                };
+                                reader.onerror = () => {
+                                    alert("Error reading file.");
+                                    setIsReadingFile(false);
                                 };
                                 reader.readAsDataURL(file);
                             } else {
-                                form.setValue('fileData', undefined);
-                                form.setValue('fileName', undefined);
+                                form.setValue('fileData', '');
+                                form.setValue('fileName', '');
+                                form.setValue('fileType', '');
+                                setIsReadingFile(false);
                             }
                         }}
                         className="cursor-pointer"
