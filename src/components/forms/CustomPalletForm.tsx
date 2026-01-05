@@ -246,6 +246,37 @@ export function CustomPalletForm() {
                     )}
                 />
 
+                <div className="space-y-2">
+                    <FormLabel>Attach Drawing or Specs (Optional, Max 2MB)</FormLabel>
+                    <Input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                        onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                                if (file.size > 2 * 1024 * 1024) {
+                                    alert("File size exceeds 2MB limit.");
+                                    e.target.value = "";
+                                    return;
+                                }
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                    const base64String = (reader.result as string).split(',')[1];
+                                    form.setValue('fileData', base64String);
+                                    form.setValue('fileName', file.name);
+                                    form.setValue('fileType', file.type);
+                                };
+                                reader.readAsDataURL(file);
+                            } else {
+                                form.setValue('fileData', undefined);
+                                form.setValue('fileName', undefined);
+                            }
+                        }}
+                        className="cursor-pointer"
+                    />
+                    <p className="text-[10px] text-muted-foreground">Supported: PDF, Images, Word docs.</p>
+                </div>
+
                 <Button type="submit" className="w-full" variant="secondary" disabled={isSubmitting}>
                     {isSubmitting ? 'Submitting...' : 'Request Custom Quote'}
                 </Button>

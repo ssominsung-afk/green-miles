@@ -29,6 +29,9 @@ export const customRequestSchema = z.object({
     heatTreated: z.enum(["Yes", "No", "Not sure"]),
     quantity: z.string().min(1, "Quantity is required"),
     notes: z.string().optional(),
+    fileData: z.string().optional(),
+    fileName: z.string().optional(),
+    fileType: z.string().optional(),
 });
 
 export type OrderRequestData = z.infer<typeof orderRequestSchema>;
