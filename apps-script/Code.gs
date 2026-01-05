@@ -103,7 +103,8 @@ function sendFinalNotifications(data, timestamp) {
                `Email: ${data.email}\n` +
                `ZIP: ${data.zip}\n` +
                `Quantity: ${data.quantity}\n` +
-               `Notes: ${data.notes || "N/A"}\n\n` +
+               `Notes: ${data.notes || "N/A"}\n` +
+               `File Attachment: ${data.fileName ? "YES (" + data.fileName + ")" : "NO"}\n\n` +
                `Database: ${SpreadsheetApp.getActiveSpreadsheet().getUrl()}`;
   
   // 1. Send Email via MailApp (Reliable & simple)
