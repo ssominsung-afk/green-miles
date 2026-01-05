@@ -9,7 +9,7 @@ export const ADDRESS = "Serving the Southeastern United States";
 export const NAV_LINKS = [
     { name: "Pallets", href: "/pallets" },
     { name: "Service Areas", href: "/service-areas/atlanta-logistics" },
-    { name: "Custom", href: "/custom" },
+    { name: "Custom Pallets", href: "/custom" },
     { name: "Shipping", href: "/shipping" },
     { name: "About", href: "/about" },
     { name: "FAQ", href: "/faq" },

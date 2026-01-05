@@ -201,6 +201,17 @@ export default function AtlantaLogisticsPage() {
                 </div>
             </section>
 
+            {/* Custom CTA Banner */}
+            <div className="mb-24 bg-muted border-2 border-primary/20 rounded-3xl p-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div className="max-w-2xl text-center md:text-left">
+                    <h3 className="text-2xl font-bold mb-2">Custom Build-to-Spec Pallets</h3>
+                    <p className="text-muted-foreground">Available for this corridor and multi-site Southeast programs. Engineered for your unique load requirements.</p>
+                </div>
+                <Link href="/custom">
+                    <Button size="lg" className="font-bold px-8">Get Custom Quote</Button>
+                </Link>
+            </div>
+
             {/* CTA Section */}
             <div className="bg-primary text-primary-foreground rounded-3xl p-12 text-center relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-8 opacity-10">

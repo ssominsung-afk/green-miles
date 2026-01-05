@@ -119,6 +119,17 @@ export default function I20WestPage() {
                 </div>
             </div>
 
+            {/* Custom CTA Banner */}
+            <div className="mb-24 bg-primary/5 border-2 border-primary/10 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                    <h3 className="text-xl font-bold mb-1 text-primary">Custom Build-to-Spec Pallets</h3>
+                    <p className="text-muted-foreground text-sm">Available for this corridor and multi-site Southeast programs.</p>
+                </div>
+                <Link href="/custom">
+                    <Button variant="default" className="font-bold px-8">Get Custom Quote</Button>
+                </Link>
+            </div>
+
             <section className="max-w-3xl mx-auto mb-24">
                 <h2 className="text-3xl font-bold mb-12 text-center text-primary">I-20 West Corridor FAQs</h2>
                 <div className="space-y-8">

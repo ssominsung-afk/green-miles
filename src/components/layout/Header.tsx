@@ -35,13 +35,13 @@ export default function Header() {
 
                 <div className="hidden md:flex items-center gap-4">
                     <Link href="/custom">
-                        <Button variant="ghost" size="sm">
-                            Custom Orders
+                        <Button variant="default" size="sm" className="font-bold">
+                            Get a Custom Quote
                         </Button>
                     </Link>
-                    <Link href="/contact">
-                        <Button size="sm">
-                            Order Now
+                    <Link href="/pallets">
+                        <Button variant="outline" size="sm">
+                            Standard Pricing
                         </Button>
                     </Link>
                 </div>
@@ -65,8 +65,8 @@ export default function Header() {
                                 </Link>
                             ))}
                             <hr className="my-2" />
-                            <Link href="/custom" className="text-sm font-medium">Custom Orders</Link>
-                            <Link href="/contact" className="text-sm font-medium">Order Now</Link>
+                            <Link href="/custom" className="text-sm font-bold text-primary">Get a Custom Quote</Link>
+                            <Link href="/pallets" className="text-sm font-medium">Standard Pricing</Link>
                         </nav>
                     </SheetContent>
                 </Sheet>

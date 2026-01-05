@@ -1,25 +1,65 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Package, Check, Truck, MapPin } from 'lucide-react';
+import { Package, Check, Truck, MapPin, Settings } from 'lucide-react';
 
 export const metadata = {
-    title: 'Atlanta Pallet Supply | GMA 48x40 & Custom | A3 Pallet',
-    description: 'Atlanta-based pallet supply across key logistics corridors. GMA 48x40, recycled, and custom pallets with confirmed availability by spec and volume.',
+    title: 'Custom & Standard Pallet Programs | Atlanta & SE | A3 Pallet',
+    description: 'Atlanta-based pallet supply programs for warehouses and distribution centers. Specializing in custom-engineered builds and standard GMA 48x40 supply across the Southeast.',
 };
 
 export default function PalletsPage() {
     return (
         <div className="container mx-auto py-16 px-4">
             <div className="text-center mb-16">
-                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4 text-primary">Atlanta Pallet Supply & Sourcing</h1>
+                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4 text-primary">Pallet Supply & Sourcing Programs</h1>
                 <p className="text-muted-foreground text-lg max-w-3xl mx-auto mb-6">
-                    A3 Pallet is Atlanta-based and supports warehouse and distribution operations with reliable pallet programs. We prioritize Atlanta metro routing first, and expand coverage across the Southeast for multi-site needs.
+                    A3 Pallet is Atlanta-based and supports warehouse operations with reliable pallet programs. We specialize in custom build-to-spec programs and consistent standard GMA supply across the Southeast.
                 </p>
             </div>
 
+            {/* Custom Hero Block */}
+            <div className="mb-20 bg-primary text-primary-foreground rounded-2xl p-10 shadow-xl relative overflow-hidden">
+                <div className="relative z-10 max-w-2xl">
+                    <h2 className="text-3xl font-bold mb-4">Need a Custom Build-to-Spec?</h2>
+                    <p className="text-primary-foreground/90 text-lg mb-8">
+                        Our core program focuses on engineered pallets designed for unique loads, automation constraints, and export compliance. We coordinate manufacturing through specialized partners to meet your exact mechanical requirements.
+                    </p>
+                    <Link href="/custom">
+                        <Button size="lg" variant="secondary" className="font-bold px-8">Review Custom Specs & Request Quote</Button>
+                    </Link>
+                </div>
+                <Package className="absolute right-[-20px] bottom-[-20px] h-64 w-64 opacity-10 rotate-12" />
+            </div>
+
+            {/* Standard vs Custom Comparison */}
+            <div className="mb-20 grid md:grid-cols-2 gap-8">
+                <div className="p-8 rounded-2xl border bg-white shadow-sm">
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                        <Package className="h-6 w-6 text-primary" />
+                        Standard 48x40 GMA
+                    </h3>
+                    <ul className="space-y-3 text-sm text-muted-foreground">
+                        <li className="flex items-start gap-2"><Check className="h-4 w-4 mt-1 text-green-600 shrink-0" /> Ideal for common warehouse racking & storage</li>
+                        <li className="flex items-start gap-2"><Check className="h-4 w-4 mt-1 text-green-600 shrink-0" /> Fast deployment for retail & distribution</li>
+                        <li className="flex items-start gap-2"><Check className="h-4 w-4 mt-1 text-green-600 shrink-0" /> Cost-effective recycled & new options</li>
+                    </ul>
+                </div>
+                <div className="p-8 rounded-2xl border-2 border-primary bg-primary/5 shadow-sm">
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-primary">
+                        <Settings className="h-6 w-6" />
+                        Custom Build-to-Spec
+                    </h3>
+                    <ul className="space-y-3 text-sm text-muted-foreground">
+                        <li className="flex items-start gap-2"><Check className="h-4 w-4 mt-1 text-primary shrink-0" /> Unique product footprints & heavy industrial loads</li>
+                        <li className="flex items-start gap-2"><Check className="h-4 w-4 mt-1 text-primary shrink-0" /> Strict automation & conveyor tolerances</li>
+                        <li className="flex items-start gap-2"><Check className="h-4 w-4 mt-1 text-primary shrink-0" /> Certified export heat-treatment (ISPM-15)</li>
+                    </ul>
+                </div>
+            </div>
+
             {/* Logistics Corridors Section */}
-            <div className="mb-20 bg-primary/5 border border-primary/20 rounded-2xl p-8">
+            <div className="mb-20 bg-muted/50 border rounded-2xl p-8">
                 <div className="flex items-center gap-3 mb-6">
                     <MapPin className="h-6 w-6 text-primary" />
                     <h2 className="text-2xl font-bold">Atlanta Logistics Corridors We Serve</h2>
@@ -74,7 +114,7 @@ export default function PalletsPage() {
                     </CardHeader>
                     <CardContent>
                         <p className="text-sm text-muted-foreground mb-4">
-                            Fresh lumber, built to strict GMA specifications through our manufacturing partner network. Ideal for automated lines and high-value goods.
+                            Fresh lumber, built to strict GMA specifications. Ideal for automated lines and high-value goods. <span className="text-primary font-medium italic">Also available as custom variants.</span>
                         </p>
                         <ul className="space-y-2 text-sm mb-6">
                             <li className="flex items-center"><Check className="h-4 w-4 mr-2 text-green-600" /> 4-Way Entry</li>
@@ -98,7 +138,7 @@ export default function PalletsPage() {
                     <CardContent>
                         <div className="absolute top-4 right-4 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">Best Seller</div>
                         <p className="text-sm text-muted-foreground mb-4">
-                            Premium refurbished pallets meticulously graded for quality. Clean appearance with no companion stringers (plugs). The cost-effective standard for retail.
+                            Premium refurbished pallets. Clean appearance with no companion stringers. <span className="text-primary font-medium italic">Also available as custom variants.</span>
                         </p>
                         <ul className="space-y-2 text-sm mb-6">
                             <li className="flex items-center"><Check className="h-4 w-4 mr-2 text-green-600" /> Structurally Sound</li>
@@ -121,7 +161,7 @@ export default function PalletsPage() {
                     </CardHeader>
                     <CardContent>
                         <p className="text-sm text-muted-foreground mb-4">
-                            Budget-friendly option for one-way shipping. Fully functional with companion stringer repairs, sourced through our regional repair network.
+                            Budget-friendly option for one-way shipping. Fully functional with companion stringer repairs.
                         </p>
                         <ul className="space-y-2 text-sm mb-6">
                             <li className="flex items-center"><Check className="h-4 w-4 mr-2 text-green-600" /> Lowest Cost</li>

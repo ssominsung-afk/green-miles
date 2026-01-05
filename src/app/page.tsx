@@ -6,8 +6,8 @@ import { COMPANY_NAME, PHONE_NUMBER } from '@/lib/constants';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Atlanta Pallet Supply & Sourcing | Warehouse & 3PL Pallets | A3 Pallet',
-  description: 'Atlanta-based pallet supply and sourcing for warehouses, manufacturers, and 3PLs. GMA 48x40, recycled, and custom pallets—serving Atlanta metro logistics corridors and the Southeast.',
+  title: 'Custom & Standard Pallet Supply Atlanta | Build-to-Spec | A3 Pallet',
+  description: 'Atlanta-based custom & standard pallet supply for warehouses, manufacturers, and 3PLs. Specialized in custom build-to-spec pallets and GMA 48x40 programs across the Southeast.',
 };
 
 export default function Home() {
@@ -18,10 +18,10 @@ export default function Home() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col items-center space-y-4 text-center">
             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-              Atlanta-Based <span className="text-secondary font-bold">Pallet Supply & Sourcing</span>
+              Atlanta-Based <span className="text-secondary font-bold">Custom & Standard Pallet Supply</span>
             </h1>
             <p className="mx-auto max-w-[700px] text-primary-foreground/90 md:text-xl">
-              Capacity-backed pallet programs for warehouses, manufacturers, and 3PLs across Atlanta’s key logistics corridors. Regional Southeast coverage available for multi-site needs.
+              Custom pallets built to your exact specs—delivered through a Southeast-wide partner network. Professional sourcing for warehouses, manufacturers, and 3PLs.
             </p>
 
             {/* Trust Block */}
@@ -41,14 +41,14 @@ export default function Home() {
             </div>
 
             <div className="flex flex-col gap-2 min-[400px]:flex-row pt-8">
-              <Link href="/contact">
-                <Button size="lg" className="w-full min-[400px]:w-auto bg-primary text-primary-foreground hover:bg-primary/90 border-2 border-primary-foreground">
-                  Request Your 1-Hour Quote
+              <Link href="/custom">
+                <Button size="lg" className="w-full min-[400px]:w-auto bg-primary text-primary-foreground hover:bg-primary/90 border-2 border-primary-foreground font-bold">
+                  Get a Custom Quote
                 </Button>
               </Link>
               <Link href="/pallets">
                 <Button variant="outline" size="lg" className="w-full min-[400px]:w-auto text-black bg-white hover:bg-gray-100">
-                  Browse Standard Pallets
+                  Standard Pallet Pricing
                 </Button>
               </Link>
             </div>
@@ -103,30 +103,61 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Custom Pallets Spotlight */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-8">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Custom Pallets Built to Spec (Our Core Program)</h2>
+              <p className="text-muted-foreground mt-4 text-lg">
+                We specialize in engineered pallet solutions that standard programs can't handle. From unique footprints to heavy-duty industrial skids, we coordinate production across a specialized partner network.
+              </p>
+            </div>
+            <Link href="/custom">
+              <Button size="lg" className="font-bold px-8">Start a Custom Spec Quote</Button>
+            </Link>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              { title: "Any footprint / any load", desc: "Custom dimensions and reinforced builds for unique product dimensions.", icon: Package },
+              { title: "Heavy-duty skids", desc: "Reinforced stringers and block-style builds for maximum load capacity.", icon: ShieldCheck },
+              { title: "Export-ready ISPM-15", desc: "Heat-treated builds coordinated through certified partner facilities.", icon: CheckCircle },
+              { title: "Multi-site Programs", desc: "Consistent custom specs delivered across your entire Southeast network.", icon: Truck },
+            ].map((item, i) => (
+              <div key={i} className="p-6 rounded-2xl border bg-muted/30 hover:bg-muted/50 transition-colors">
+                <item.icon className="h-10 w-10 text-primary mb-4" />
+                <h3 className="font-bold mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Product Preview */}
-      <section className="py-16 bg-muted/20 pb-24">
+      <section className="py-16 bg-muted/20 pb-24 border-t">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Program-Driven Solutions</h2>
             <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">Backed by vetted partner production lines and regional logistics fleets.</p>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <Card className="hover:shadow-lg transition-shadow border-primary/20">
+              <CardHeader>
+                <Settings className="h-10 w-10 text-primary mb-2" />
+                <CardTitle>Custom Specs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">Build-to-spec pallets designed for your unique load requirements and manufactured at specialized partner facilities. Our primary focus for complex operations.</p>
+              </CardContent>
+            </Card>
             <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <Package className="h-10 w-10 text-primary mb-2" />
                 <CardTitle>Standard Pallets</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">Reliable supply of new and recycled 48x40 GMA pallets, fulfilled through our quality-controlled partner network.</p>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Settings className="h-10 w-10 text-primary mb-2" />
-                <CardTitle>Custom Specs</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Build-to-spec pallets designed for your unique load requirements and manufactured at specialized partner facilities.</p>
+                <p className="text-sm text-muted-foreground">Reliable supply of new and recycled 48x40 GMA pallets, fulfilled through our quality-controlled partner network for standard warehouse needs.</p>
               </CardContent>
             </Card>
             <Card className="hover:shadow-lg transition-shadow">
@@ -135,7 +166,7 @@ export default function Home() {
                 <CardTitle>Fulfillment Logistics</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">Regional delivery coordination supported by partner fleets and trusted carriers, including drop-trailer options.</p>
+                <p className="text-sm text-muted-foreground">Regional delivery coordination supported by partner fleets and trusted carriers, including drop-trailer options across the Southeast.</p>
               </CardContent>
             </Card>
           </div>

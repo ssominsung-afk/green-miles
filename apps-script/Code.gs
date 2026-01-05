@@ -40,9 +40,12 @@ function doPost(e) {
     
     // 1. Log Raw Request for Debugging
     const rawData = e.postData.contents;
-    debugSheet.appendRow([timestamp, "RECEIVED", rawData]);
-    
     const data = JSON.parse(rawData);
+    
+    // Log keys and lengths for debugging
+    const payloadInfo = Object.keys(data).map(key => `${key}: ${String(data[key]).length}`).join(", ");
+    debugSheet.appendRow([timestamp, "V4-DRIVE-RECEIVED", payloadInfo]);
+    
     if (data.token !== CONFIG.API_TOKEN) return responseError("Invalid Token");
 
     const formType = data.formType;
@@ -60,9 +63,15 @@ function doPost(e) {
     // 2. Append Data Record
     const fileSize = data.fileData ? Math.round(data.fileData.length * 0.75 / 1024) : 0;
     let driveLink = "";
+    let uploadStatus = "NO_FILE";
     
     if (data.fileData && data.fileName) {
-      driveLink = saveFileToDrive(data);
+      try {
+        driveLink = saveFileToDrive(data);
+        uploadStatus = driveLink ? "UPLOAD_SUCCESS" : "UPLOAD_FAILED";
+      } catch (err) {
+        uploadStatus = "UPLOAD_ERROR: " + err.toString();
+      }
     }
 
     const row = [
@@ -78,20 +87,21 @@ function doPost(e) {
       data.deliveryMode || data.loadRating, 
       data.deliveryAddress || data.woodType, 
       data.notes,
-      driveLink || (data.fileName ? data.fileName + " (Failed to upload)" : "")
+      driveLink || (data.fileName ? data.fileName + " (" + uploadStatus + ")" : "")
     ];
     sheet.appendRow(row);
 
     // 3. Record to Activity Log
     const logSheet = ss.getSheetByName(CONFIG.SHEETS.LOG) || ss.insertSheet(CONFIG.SHEETS.LOG);
-    if (logSheet.getLastRow() === 0) logSheet.appendRow(["Timestamp", "Activity", "Form Type", "Email"]);
-    logSheet.appendRow([timestamp, "Order Received", formType, data.email]);
+    if (logSheet.getLastRow() === 0) logSheet.appendRow(["Timestamp", "Activity", "Form Type", "Email", "Status"]);
+    logSheet.appendRow([timestamp, "Order Received", formType, data.email, uploadStatus]);
 
     // 4. Trigger Notifications
     sendFinalNotifications(data, timestamp, driveLink);
 
     return responseSuccess();
   } catch (err) {
+    debugSheet.appendRow([new Date(), "ERROR_MAIN", err.toString()]);
     return responseError(err.toString());
   } finally {
     lock.releaseLock();
@@ -208,4 +218,20 @@ function testSubmission() {
     }
   };
   console.log(doPost(mockEvent).getContent());
+}
+
+/**
+ * INITIALIZATION FUNCTION: Run this once to grant Drive permissions.
+ */
+function initDrive() {
+  const folderName = "A3_Website_Uploads";
+  let folder;
+  const folders = DriveApp.getFoldersByName(folderName);
+  if (folders.hasNext()) {
+    folder = folders.next();
+    console.log("Folder already exists: " + folder.getUrl());
+  } else {
+    folder = DriveApp.createFolder(folderName);
+    console.log("Folder created: " + folder.getUrl());
+  }
 }

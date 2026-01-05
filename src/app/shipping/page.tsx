@@ -1,6 +1,8 @@
 import { SERVICE_AREAS } from '@/lib/constants';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Truck } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export const metadata = {
     title: 'Reliable Delivery & Logistics Coordination | A3 Pallet',
@@ -65,7 +67,16 @@ export default function ShippingPage() {
                             ))}
                         </ul>
                         <div className="mt-8 p-4 bg-primary/5 rounded-xl border border-primary/20">
-                            <p className="text-xs text-center text-muted-foreground italic">
+                            <h3 className="font-bold text-sm mb-2 text-primary">Custom Pallet Programs</h3>
+                            <p className="text-xs text-muted-foreground leading-relaxed mb-4">
+                                Custom build-to-spec runs may require additional production time. We coordinate regional delivery Southeast-wide once production is cleared.
+                            </p>
+                            <Link href="/custom">
+                                <Button size="sm" variant="outline" className="w-full font-bold">Review Custom Specs</Button>
+                            </Link>
+                        </div>
+                        <div className="mt-4">
+                            <p className="text-[10px] text-center text-muted-foreground italic">
                                 *Expedited options available for major manufacturing corridors within our core service area.
                             </p>
                         </div>
