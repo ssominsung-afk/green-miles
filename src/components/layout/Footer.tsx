@@ -20,7 +20,7 @@ export default function Footer() {
                             />
                         </div>
                         <p className="text-sm text-muted-foreground">
-                            Reliable pallet sourcing and logistics solutions for the Southeastern United States.
+                            Atlanta-based pallet supply and logistics solutions for technical warehouse and distribution operations across the Southeast.
                         </p>
                     </div>
 
