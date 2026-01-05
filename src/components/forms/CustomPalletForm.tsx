@@ -50,6 +50,7 @@ export function CustomPalletForm() {
             alert("Please wait for the file to finish processing.");
             return;
         }
+        console.log("Submitting Custom Request:", data);
         setIsSubmitting(true);
         try {
             await submitCustomRequest(data);
@@ -292,6 +293,11 @@ export function CustomPalletForm() {
                     />
                     <p className="text-[10px] text-muted-foreground">Supported: PDF, Images, Word docs.</p>
                 </div>
+
+                {/* Hidden fields to ensure registration */}
+                <input type="hidden" {...form.register('fileData')} />
+                <input type="hidden" {...form.register('fileName')} />
+                <input type="hidden" {...form.register('fileType')} />
 
                 <Button type="submit" className="w-full" variant="secondary" disabled={isSubmitting}>
                     {isSubmitting ? 'Submitting...' : 'Request Custom Quote'}

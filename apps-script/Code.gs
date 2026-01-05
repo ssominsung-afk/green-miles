@@ -58,6 +58,7 @@ function doPost(e) {
     }
 
     // 2. Append Data Record
+    const fileSize = data.fileData ? Math.round(data.fileData.length * 0.75 / 1024) : 0;
     const row = [
       timestamp, 
       data.name, 
@@ -71,7 +72,7 @@ function doPost(e) {
       data.deliveryMode || data.loadRating, 
       data.deliveryAddress || data.woodType, 
       data.notes,
-      data.fileName || ""
+      data.fileName ? data.fileName + " (" + fileSize + " KB)" : ""
     ];
     sheet.appendRow(row);
 
@@ -81,7 +82,7 @@ function doPost(e) {
     logSheet.appendRow([timestamp, "Order Received", formType, data.email]);
 
     // 4. Trigger Notifications
-    sendFinalNotifications(data, timestamp);
+    sendFinalNotifications(data, timestamp, fileSize);
 
     return responseSuccess();
   } catch (err) {
@@ -94,7 +95,7 @@ function doPost(e) {
 /**
  * Core notification logic for Email and SMS.
  */
-function sendFinalNotifications(data, timestamp) {
+function sendFinalNotifications(data, timestamp, fileSize) {
   const subject = `New Website Inquiry - ${data.company}`;
   const body = `Details for ${data.formType}:\n\n` +
                `Customer: ${data.name}\n` +
@@ -104,10 +105,10 @@ function sendFinalNotifications(data, timestamp) {
                `ZIP: ${data.zip}\n` +
                `Quantity: ${data.quantity}\n` +
                `Notes: ${data.notes || "N/A"}\n` +
-               `File Attachment: ${data.fileName ? "YES (" + data.fileName + ")" : "NO"}\n\n` +
+               `File Attachment: ${data.fileName ? "YES (" + data.fileName + ", " + fileSize + " KB)" : "NO"}\n\n` +
                `Database: ${SpreadsheetApp.getActiveSpreadsheet().getUrl()}`;
   
-  // 1. Send Email via MailApp (Reliable & simple)
+  // 1. Send Email via GmailApp (Often more robust for attachments)
   const myEmail = Session.getActiveUser().getEmail();
   const options = {};
   
@@ -121,16 +122,19 @@ function sendFinalNotifications(data, timestamp) {
       options.attachments = [blob];
     } catch (e) {
       console.error("Attachment processing error: " + e.toString());
+      // Log error to debug sheet
+      SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.DEBUG).appendRow([new Date(), "ATTACHMENT_ERROR", e.toString()]);
     }
   }
 
   try {
-    MailApp.sendEmail(CONFIG.EMAILS[0], subject, body, options);
+    GmailApp.sendEmail(CONFIG.EMAILS[0], subject, body, options);
     if (CONFIG.EMAILS[0] !== myEmail) {
-      MailApp.sendEmail(myEmail, "Copy: " + subject, body, options);
+      GmailApp.sendEmail(myEmail, "Copy: " + subject, body, options);
     }
   } catch (e) {
     console.error("Email Error: " + e.toString());
+    SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEETS.DEBUG).appendRow([new Date(), "EMAIL_ERROR", e.toString()]);
   }
 
   // 2. Send SMS via Twilio API
