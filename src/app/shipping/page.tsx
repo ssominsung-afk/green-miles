@@ -15,7 +15,7 @@ export default function ShippingPage() {
             <div className="text-center mb-16">
                 <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Coordinated Logistics & Fulfillment</h1>
                 <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-                    Logistics is where most supply programs fail—A3 Pallet is where they excel. we coordinate Southeast-wide delivery across the Southeast, supported by partner fleets and a network of trusted carriers.
+                    Logistics is where most supply programs fail—A3 Pallet is where they excel. We coordinate Southeast-wide delivery, supported by partner fleets and a network of trusted carriers.
                 </p>
             </div>
 

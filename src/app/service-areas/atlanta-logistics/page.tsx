@@ -5,7 +5,7 @@ import { MapPin, Truck, ChevronRight, CheckCircle2, Factory, Warehouse } from 'l
 import { COMPANY_NAME } from '@/lib/constants';
 
 export const metadata = {
-    title: 'Atlanta Pallet Supply by Logistics Corridor | A3 Pallet',
+    title: 'Atlanta Pallet Supply by Logistics Corridor',
     description: 'Atlanta-based pallet supply and sourcing across major industrial corridors: I-85 North, Airport/I-85 South, I-75 South, I-20 West, and I-20 East.',
 };
 
@@ -203,9 +203,15 @@ export default function AtlantaLogisticsPage() {
 
             {/* Custom CTA Banner */}
             <div className="mb-24 bg-muted border-2 border-primary/20 rounded-3xl p-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                <div className="max-w-2xl text-center md:text-left">
-                    <h3 className="text-2xl font-bold mb-2">Custom Build-to-Spec Pallets</h3>
-                    <p className="text-muted-foreground">Available for this corridor and multi-site Southeast programs. Engineered for your unique load requirements.</p>
+                <div className="max-w-2xl">
+                    <h3 className="text-2xl font-bold mb-4 text-primary">Custom Build-to-Spec Pallets</h3>
+                    <ul className="grid sm:grid-cols-2 gap-2 text-muted-foreground mb-6">
+                        <li>• Heat-treated (ISPM-15) Export</li>
+                        <li>• Heavy-duty industrial skids</li>
+                        <li>• Custom-engineered footprints</li>
+                        <li>• Multi-site Southeast delivery</li>
+                    </ul>
+                    <p className="text-muted-foreground text-sm italic">Engineered for your unique mechanical load requirements and complex PDS prints.</p>
                 </div>
                 <Link href="/custom">
                     <Button size="lg" className="font-bold px-8">Get Custom Quote</Button>

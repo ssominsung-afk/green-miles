@@ -7,10 +7,16 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPolicy() {
+    const today = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
     return (
         <div className="container mx-auto py-16 px-4 max-w-4xl">
-            <h1 className="text-4xl font-bold mb-8">Privacy Policy</h1>
-            <p className="text-muted-foreground mb-6">Last updated: {new Date().toLocaleDateString()}</p>
+            <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
+            <p className="text-muted-foreground mb-8 text-sm">Last updated: {today}</p>
 
             <section className="mb-8">
                 <h2 className="text-2xl font-semibold mb-4">Introduction</h2>

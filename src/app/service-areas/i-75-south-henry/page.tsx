@@ -4,13 +4,27 @@ import Link from 'next/link';
 import { MapPin, Truck, ChevronRight, CheckCircle2, Warehouse, ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-    title: 'I-75 South Pallet Supply | Henry County & McDonough | A3 Pallet',
+    title: 'I-75 South Pallet Supply | Henry County & McDonough',
     description: 'Specialized pallet supply and sourcing for the I-75 South corridor, serving McDonough, Locust Grove, and Stockbridge distribution hubs.',
 };
 
 export default function I75SouthHenryPage() {
+    const breadcrumbJson = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://a3pallet.com" },
+            { "@type": "ListItem", "position": 2, "name": "Atlanta Service Areas", "item": "https://a3pallet.com/service-areas/atlanta-logistics" },
+            { "@type": "ListItem", "position": 3, "name": "I-75 South Corridor", "item": "https://a3pallet.com/service-areas/i-75-south-henry" }
+        ]
+    };
+
     return (
         <div className="container mx-auto py-16 px-4">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJson) }}
+            />
             <nav className="flex mb-8 text-sm text-muted-foreground" aria-label="Breadcrumb">
                 <ol className="flex items-center space-x-2">
                     <li><Link href="/" className="hover:text-primary">Home</Link></li>
@@ -122,8 +136,12 @@ export default function I75SouthHenryPage() {
             {/* Custom CTA Banner */}
             <div className="mb-24 bg-primary/5 border-2 border-primary/10 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>
-                    <h3 className="text-xl font-bold mb-1 text-primary">Custom Build-to-Spec Pallets</h3>
-                    <p className="text-muted-foreground text-sm">Available for this corridor and multi-site Southeast programs.</p>
+                    <h3 className="text-xl font-bold mb-2 text-primary">Custom Pallets for the I-75 South Corridor</h3>
+                    <ul className="text-sm text-muted-foreground space-y-1 mb-4">
+                        <li>• Heat-treated (ISPM-15) for international export</li>
+                        <li>• Heavy-duty skids and odd-sized footprints</li>
+                        <li>• Custom-engineered builds for automation lines</li>
+                    </ul>
                 </div>
                 <Link href="/custom">
                     <Button variant="default" className="font-bold px-8">Get Custom Quote</Button>

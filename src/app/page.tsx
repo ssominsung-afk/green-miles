@@ -6,7 +6,7 @@ import { COMPANY_NAME, PHONE_NUMBER } from '@/lib/constants';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Custom & Standard Pallet Supply Atlanta | Build-to-Spec | A3 Pallet',
+  title: 'Custom & Standard Pallet Supply Atlanta | Build-to-Spec',
   description: 'Atlanta-based custom & standard pallet supply for warehouses, manufacturers, and 3PLs. Specialized in custom build-to-spec pallets and GMA 48x40 programs across the Southeast.',
 };
 
@@ -104,25 +104,30 @@ export default function Home() {
       </section>
 
       {/* Custom Pallets Spotlight */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white" id="custom-spotlight">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-8">
             <div className="max-w-2xl">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Custom Pallets Built to Spec (Our Core Program)</h2>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Custom Build-to-Spec Pallets (Higher-Performance Programs)</h2>
               <p className="text-muted-foreground mt-4 text-lg">
-                We specialize in engineered pallet solutions that standard programs can't handle. From unique footprints to heavy-duty industrial skids, we coordinate production across a specialized partner network.
+                We bridge the gap between complex engineering and reliable supply. Whether you have <strong>PDS prints</strong> or just <strong>mechanical load dimensions</strong>, our partner network provides the high-margin, heavy-duty solutions your automation or export lines require.
               </p>
             </div>
-            <Link href="/custom">
-              <Button size="lg" className="font-bold px-8">Start a Custom Spec Quote</Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link href="/custom">
+                <Button size="lg" className="font-bold px-8">Get Custom Quote (1 hour)</Button>
+              </Link>
+              <Link href="/custom">
+                <Button size="lg" variant="outline" className="font-bold px-8">Upload Specs</Button>
+              </Link>
+            </div>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[
-              { title: "Any footprint / any load", desc: "Custom dimensions and reinforced builds for unique product dimensions.", icon: Package },
-              { title: "Heavy-duty skids", desc: "Reinforced stringers and block-style builds for maximum load capacity.", icon: ShieldCheck },
-              { title: "Export-ready ISPM-15", desc: "Heat-treated builds coordinated through certified partner facilities.", icon: CheckCircle },
-              { title: "Multi-site Programs", desc: "Consistent custom specs delivered across your entire Southeast network.", icon: Truck },
+              { title: "PDS Design Support", desc: "Design assistance for custom footprints based on drawings or load specs.", icon: Settings },
+              { title: "Heavy-Duty Skids", desc: "Reinforced blocks and specialized material for massive industrial loads.", icon: ShieldCheck },
+              { title: "Automation Ready", desc: "Built to exact tolerances for robotic lines and high-speed conveyors.", icon: Package },
+              { title: "Export Certified", desc: "HT (ISPM-15) compliant builds for safe, compliant international transit.", icon: CheckCircle },
             ].map((item, i) => (
               <div key={i} className="p-6 rounded-2xl border bg-muted/30 hover:bg-muted/50 transition-colors">
                 <item.icon className="h-10 w-10 text-primary mb-4" />

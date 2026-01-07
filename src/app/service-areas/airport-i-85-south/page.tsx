@@ -4,13 +4,27 @@ import Link from 'next/link';
 import { MapPin, Truck, ChevronRight, CheckCircle2, Warehouse, ArrowLeft, Plane } from 'lucide-react';
 
 export const metadata = {
-    title: 'Airport & I-85 South Pallet Supply | Union City & Fairburn | A3 Pallet',
+    title: 'Airport & I-85 South Pallet Supply | Union City & Fairburn',
     description: 'Specialized pallet supply and sourcing for the Airport / I-85 South corridor, serving Union City, Fairburn, and the South Fulton logistics region.',
 };
 
 export default function AirportI85SouthPage() {
+    const breadcrumbJson = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://a3pallet.com" },
+            { "@type": "ListItem", "position": 2, "name": "Atlanta Service Areas", "item": "https://a3pallet.com/service-areas/atlanta-logistics" },
+            { "@type": "ListItem", "position": 3, "name": "Airport / I-85 South", "item": "https://a3pallet.com/service-areas/airport-i-85-south" }
+        ]
+    };
+
     return (
         <div className="container mx-auto py-16 px-4">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJson) }}
+            />
             <nav className="flex mb-8 text-sm text-muted-foreground" aria-label="Breadcrumb">
                 <ol className="flex items-center space-x-2">
                     <li><Link href="/" className="hover:text-primary">Home</Link></li>
@@ -122,8 +136,12 @@ export default function AirportI85SouthPage() {
             {/* Custom CTA Banner */}
             <div className="mb-24 bg-primary/5 border-2 border-primary/10 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>
-                    <h3 className="text-xl font-bold mb-1 text-primary">Custom Build-to-Spec Pallets</h3>
-                    <p className="text-muted-foreground text-sm">Available for this corridor and multi-site Southeast programs.</p>
+                    <h3 className="text-xl font-bold mb-2 text-primary">Custom Pallets for the Airport Corridor</h3>
+                    <ul className="text-sm text-muted-foreground space-y-1 mb-4">
+                        <li>• Heat-treated (ISPM-15) for international export</li>
+                        <li>• Heavy-duty skids and odd-sized footprints</li>
+                        <li>• Custom-engineered builds for automation lines</li>
+                    </ul>
                 </div>
                 <Link href="/custom">
                     <Button variant="default" className="font-bold px-8">Get Custom Quote</Button>

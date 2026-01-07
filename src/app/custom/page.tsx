@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { CustomPalletForm } from '@/components/forms/CustomPalletForm';
 
 export const metadata = {
-    title: 'Custom Pallets Build-to-Spec | Atlanta & Southeast | A3 Pallet',
+    title: 'Custom Pallets Build-to-Spec | Atlanta & Southeast',
     description: 'Custom-engineered pallets and skids built to your specs—heavy loads, automation, and ISPM-15 heat-treated export builds. Atlanta-based with Southeast-wide delivery coordination.',
 };
 

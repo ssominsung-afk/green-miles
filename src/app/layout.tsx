@@ -37,7 +37,7 @@ const jsonLd = {
   "logo": "https://a3pallet.com/logo-a3-pallet.png",
   "image": "https://a3pallet.com/logo-a3-pallet.png",
   "description":
-    "Atlanta-based pallet supply and sourcing for warehouses, manufacturers, and 3PLs across the Southeast US.",
+    "Atlanta-based custom and standard pallet supply and sourcing for warehouses, manufacturers, and 3PLs. Specializing in build-to-spec programs across the Southeast US (GA, FL, AL, NC, SC, TN).",
   "telephone": "+1-470-962-7000",
   "address": {
     "@type": "PostalAddress",
@@ -51,6 +51,12 @@ const jsonLd = {
     "longitude": -84.3880
   },
   "areaServed": [
+    { "@type": "State", "name": "Georgia" },
+    { "@type": "State", "name": "Florida" },
+    { "@type": "State", "name": "Alabama" },
+    { "@type": "State", "name": "North Carolina" },
+    { "@type": "State", "name": "South Carolina" },
+    { "@type": "State", "name": "Tennessee" },
     { "@type": "City", "name": "Atlanta" },
     { "@type": "City", "name": "Norcross" },
     { "@type": "City", "name": "Buford" },

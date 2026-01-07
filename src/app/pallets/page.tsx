@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Package, Check, Truck, MapPin, Settings } from 'lucide-react';
 
 export const metadata = {
-    title: 'Custom & Standard Pallet Programs | Atlanta & SE | A3 Pallet',
+    title: 'Custom & Standard Pallet Programs | Atlanta & SE',
     description: 'Atlanta-based pallet supply programs for warehouses and distribution centers. Specializing in custom-engineered builds and standard GMA 48x40 supply across the Southeast.',
 };
 
@@ -21,9 +21,9 @@ export default function PalletsPage() {
             {/* Custom Hero Block */}
             <div className="mb-20 bg-primary text-primary-foreground rounded-2xl p-10 shadow-xl relative overflow-hidden">
                 <div className="relative z-10 max-w-2xl">
-                    <h2 className="text-3xl font-bold mb-4">Need a Custom Build-to-Spec?</h2>
+                    <h2 className="text-3xl font-bold mb-4">Custom First: Engineered Specs</h2>
                     <p className="text-primary-foreground/90 text-lg mb-8">
-                        Our core program focuses on engineered pallets designed for unique loads, automation constraints, and export compliance. We coordinate manufacturing through specialized partners to meet your exact mechanical requirements.
+                        While we supply standard GMA pallets at scale, our core focuses on <strong>engineered custom-spec programs</strong> (MOQ 50–100+). We bridge the gap between complex PDS requirements and multi-site Southeast delivery coordination.
                     </p>
                     <Link href="/custom">
                         <Button size="lg" variant="secondary" className="font-bold px-8">Review Custom Specs & Request Quote</Button>

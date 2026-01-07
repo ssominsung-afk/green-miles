@@ -6,8 +6,8 @@ import {
 } from '@/components/ui/accordion';
 
 export const metadata = {
-    title: 'Pallet Supply FAQs | Questions About A3 Pallet Programs',
-    description: 'Get answers to common questions about pallet grades, lead times, custom specs, and our partner-backed supply model.',
+    title: 'Pallet Supply FAQs | Sourcing & Logistics',
+    description: 'Answers to common questions about pallet grades, lead times, custom builds, and Southeast regional supply coordination.',
 };
 
 const FAQS = [

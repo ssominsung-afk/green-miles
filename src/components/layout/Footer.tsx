@@ -43,11 +43,11 @@ export default function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="font-semibold mb-3">Legal</h3>
+                        <h3 className="font-semibold mb-3 text-foreground">Legal</h3>
                         <ul className="space-y-2 text-sm text-muted-foreground">
-                            <li><Link href="/privacy">Privacy Policy</Link></li>
-                            <li><Link href="/terms">Terms of Service</Link></li>
-                            <li><Link href="/sms-optin-internal" className="text-[10px] opacity-70">SMS Opt-In</Link></li>
+                            <li><Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+                            <li><Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
+                            <li><Link href="/sms-optin-internal" className="hover:text-primary transition-colors">SMS Opt-In (Internal)</Link></li>
                         </ul>
                     </div>
                 </div>

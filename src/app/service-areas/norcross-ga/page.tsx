@@ -84,7 +84,7 @@ export default function NorcrossGAPage() {
                             <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-2 mt-4">
                                 <li><strong>Consumer Electronics:</strong> Distribution centers requiring clean, sized pallets.</li>
                                 <li><strong>Industrial Machinery:</strong> Manufacturers needing custom and heavy-duty builds.</li>
-                                <li><strong>Logostics Providers (3PL):</strong> General pallet supply for multi-tenant facilities.</li>
+                                <li><strong>Logistics Providers (3PL):</strong> General pallet supply for multi-tenant facilities.</li>
                                 <li><strong>Print & Packaging:</strong> Efficient pallet programs for high-volume producers.</li>
                             </ul>
                         </div>
@@ -114,8 +114,12 @@ export default function NorcrossGAPage() {
             {/* Custom CTA Banner */}
             <div className="mb-24 bg-primary/5 border-2 border-primary/10 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>
-                    <h3 className="text-xl font-bold mb-1 text-primary">Custom Build-to-Spec Pallets</h3>
-                    <p className="text-muted-foreground text-sm">Available for this corridor and multi-site Southeast programs.</p>
+                    <h3 className="text-xl font-bold mb-2 text-primary">Need Custom Pallets in Norcross?</h3>
+                    <ul className="text-sm text-muted-foreground space-y-1 mb-4">
+                        <li>• Heat-treated (ISPM-15) for international export</li>
+                        <li>• Heavy-duty skids and odd-sized footprints</li>
+                        <li>• Custom-engineered builds for automation lines</li>
+                    </ul>
                 </div>
                 <Link href="/custom">
                     <Button variant="default" className="font-bold px-8">Get Custom Quote</Button>
