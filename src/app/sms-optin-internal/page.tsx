@@ -1,6 +1,7 @@
 import { COMPANY_NAME, COMPANY_EMAILS, PHONE_NUMBER } from '@/lib/constants';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import SMSOptInForm from './SMSOptInForm';
 
 export const metadata: Metadata = {
     title: 'SMS Opt-In (Internal Alerts)',
@@ -8,11 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default function SMSOptIn() {
-    const today = new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+    const today = "January 7, 2026";
 
     return (
         <div className="container mx-auto py-16 px-4 max-w-4xl">
@@ -36,51 +33,18 @@ export default function SMSOptIn() {
             </section>
 
             <section className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4 border-b pb-2 text-primary">C) Consent / Opt-in method</h2>
-                <p className="mb-2">
-                    Opt-in is obtained via <strong>VERBAL consent</strong> from each internal recipient using the script below.
-                </p>
-                <p>
-                    We record the date/time and recipient phone number for each verbal opt-in for compliance.
-                </p>
-            </section>
-
-            <section className="mb-8 p-6 bg-slate-50 border rounded-lg">
-                <h2 className="text-2xl font-semibold mb-4 border-b pb-2 text-primary">D) VERBAL CONSENT SCRIPT</h2>
-                <div className="italic text-slate-700 space-y-4">
-                    <p className="font-semibold not-italic underline mb-2">Verbal Consent Script — A3 Pallet (Internal Alerts Only)</p>
-                    <p>
-                        "Hi, this is A3 Pallet. We’d like your permission to send SMS text messages to this phone number for internal operational alerts (new quote/order request notifications)."
+                <h2 className="text-2xl font-semibold mb-4 border-b pb-2 text-primary">C) Web Form Opt-In</h2>
+                <div className="mb-6">
+                    <p className="mb-4 text-slate-700">
+                        Internal personnel must provide explicit consent via the secure web form below to receive operational alerts.
+                        The opt-in checkbox is optional and must be checked to initiate alerts.
                     </p>
-                    <p>
-                        "Message frequency varies (typically 0–10/day). Msg & data rates may apply."
-                    </p>
-                    <p>
-                        "You can opt out at any time by replying STOP. For help, reply HELP or email {COMPANY_EMAILS.SALES}."
-                    </p>
-                    <p>
-                        "Do you agree to receive these SMS text messages from A3 Pallet at this phone number?"
-                    </p>
-                    <p>
-                        <strong>If yes:</strong> "Thank you. You are opted in for internal alerts."
-                    </p>
-                    <p>
-                        <strong>If no:</strong> "No problem. We will not send SMS to this number."
-                    </p>
+                    <SMSOptInForm />
                 </div>
             </section>
 
             <section className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4 border-b pb-2 text-primary">E) Message purpose and frequency</h2>
-                <ul className="list-disc ml-6 space-y-2">
-                    <li><strong>Purpose:</strong> New quote/order request alerts to ensure fast response times.</li>
-                    <li><strong>Frequency:</strong> Varies based on website activity (typically 0–10 messages per day).</li>
-                    <li><strong>Msg & data rates may apply.</strong></li>
-                </ul>
-            </section>
-
-            <section className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4 border-b pb-2 text-primary">F) Opt-out / Help</h2>
+                <h2 className="text-2xl font-semibold mb-4 border-b pb-2 text-primary">D) Opt-out / Help</h2>
                 <ul className="list-disc ml-6 space-y-2">
                     <li>Reply <strong>STOP</strong> to opt out.</li>
                     <li>Reply <strong>HELP</strong> for assistance.</li>
@@ -88,8 +52,8 @@ export default function SMSOptIn() {
             </section>
 
             <section className="mb-12">
-                <h2 className="text-2xl font-semibold mb-4 border-b pb-2 text-primary">G) Contact</h2>
-                <div className="p-4 bg-muted rounded-lg">
+                <h2 className="text-2xl font-semibold mb-4 border-b pb-2 text-primary">E) Contact</h2>
+                <div className="p-4 bg-muted rounded-lg border">
                     <p><strong>Email:</strong> {COMPANY_EMAILS.SALES}</p>
                     <p><strong>Phone:</strong> {PHONE_NUMBER}</p>
                 </div>
