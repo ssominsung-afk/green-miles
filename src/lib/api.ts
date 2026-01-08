@@ -1,8 +1,28 @@
 import { OrderRequestData, CustomRequestData } from './types';
 
 // Apps Script Web App URL (Simon's Account)
-const CRM_URL = process.env.NEXT_PUBLIC_CRM_URL || "https://script.google.com/macros/s/AKfycbzdLra2K3XEwYEstv8VE7m-oP2LlSLDBgHmqpQpJ2W62cI9PQUMZni72zIkh837vycamg/exec";
+const CRM_URL = process.env.NEXT_PUBLIC_CRM_URL || "https://script.google.com/macros/s/AKfycbxtJVSOeGo7XsB5C8fNsH6zhwQAWlUHSkImPiwu3eIYklce2pNpwOzy19CuWJtEnm1n/exec";
 const CRM_TOKEN = process.env.NEXT_PUBLIC_CRM_TOKEN || "a3-secure-token-2026-xyz";
+
+async function handleResponse(response: Response) {
+    const text = await response.text();
+    let result;
+    try {
+        result = JSON.parse(text);
+    } catch (e) {
+        console.error("Failed to parse Apps Script response:", text);
+        // Apps Script HTML error pages are long, so just take the title or substring
+        const errorSummary = text.includes("<title>")
+            ? text.split("<title>")[1].split("</title>")[0]
+            : text.substring(0, 100);
+        throw new Error(`Server Error: ${errorSummary}...`);
+    }
+
+    if (!result.success) {
+        throw new Error(result.error || "Submission failed");
+    }
+    return result;
+}
 
 export async function submitOrder(data: OrderRequestData) {
     if (!CRM_URL) throw new Error("CRM URL is not configured");
@@ -22,11 +42,7 @@ export async function submitOrder(data: OrderRequestData) {
         body: JSON.stringify(payload),
     });
 
-    const result = await response.json();
-    if (!result.success) {
-        throw new Error(result.error || "Submission failed");
-    }
-    return result;
+    return handleResponse(response);
 }
 
 export async function submitCustomRequest(data: CustomRequestData) {
@@ -47,9 +63,5 @@ export async function submitCustomRequest(data: CustomRequestData) {
         body: JSON.stringify(payload),
     });
 
-    const result = await response.json();
-    if (!result.success) {
-        throw new Error(result.error || "Submission failed");
-    }
-    return result;
+    return handleResponse(response);
 }

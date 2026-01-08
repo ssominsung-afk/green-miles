@@ -45,13 +45,14 @@ export function CustomPalletForm() {
         },
     });
 
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
     async function onSubmit(data: CustomRequestData) {
         if (isReadingFile) {
             alert("Please wait for the file to finish processing.");
             return;
         }
 
-        // Prepare the payload with the new files array structure
         const submissionData = {
             ...data,
             files: data.fileData ? [{
@@ -63,14 +64,16 @@ export function CustomPalletForm() {
 
         console.log("Submitting Custom Request:", submissionData);
         setIsSubmitting(true);
+        setErrorMessage(null); // Clear previous errors
         try {
             await submitCustomRequest(submissionData as any);
             setSubmitStatus('success');
             trackLead('quote');
             form.reset();
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
             setSubmitStatus('error');
+            setErrorMessage(error.message || "An unexpected error occurred.");
         } finally {
             setIsSubmitting(false);
         }
@@ -315,6 +318,11 @@ export function CustomPalletForm() {
                 <Button type="submit" className="w-full" variant="secondary" disabled={isSubmitting}>
                     {isSubmitting ? 'Submitting...' : 'Request Custom Quote'}
                 </Button>
+                {errorMessage && (
+                    <div className="text-red-600 text-sm text-center mt-2 p-2 bg-red-50 rounded border border-red-200">
+                        Error: {errorMessage}
+                    </div>
+                )}
             </form>
         </Form>
     );
