@@ -1,7 +1,7 @@
 import { OrderRequestData, CustomRequestData } from './types';
 
 // Apps Script Web App URL (Simon's Account)
-const CRM_URL = process.env.NEXT_PUBLIC_CRM_URL || "https://script.google.com/macros/s/AKfycbyVkexBkm5sPfg7HoZOSNpwlSNoQlNh91T0k8eqgTbZNqUqhFMfItnnjweAQj7gG2wA/exec";
+const CRM_URL = process.env.NEXT_PUBLIC_CRM_URL || "https://script.google.com/macros/s/AKfycby0s09oYVyH9qAfvWsv8P9iEmQ2Ud5ymxDxdCBZ_ywSUMhHwkECAOUss69ctgiNpt8x/exec";
 const CRM_TOKEN = process.env.NEXT_PUBLIC_CRM_TOKEN || "a3-secure-token-2026-xyz";
 
 async function handleResponse(response: Response) {
