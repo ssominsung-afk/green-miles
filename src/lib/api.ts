@@ -1,7 +1,7 @@
 import { OrderRequestData, CustomRequestData } from './types';
 
 // Apps Script Web App URL (Simon's Account)
-const CRM_URL = "https://script.google.com/macros/s/AKfycbwXJ0JqtbrKH7TUgAQrq7V1zdA_EewuFoJ0pxbZd_M5SNCTDipoCYC3TLS1zzbtZe1Y/exec";
+const CRM_URL = "https://script.google.com/macros/s/AKfycbwyr6SafCR9fkeCFBhvcgkq17B5g23HPF8PBd2ZNWjkAYKIumlMWwqvSluj-VqZCzeF/exec";
 const CRM_TOKEN = "a3-secure-token-2026-xyz";
 
 async function handleResponse(response: Response) {
