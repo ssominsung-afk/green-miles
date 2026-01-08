@@ -5,10 +5,10 @@
 
 const CONFIG = {
   // SETTINGS - UPDATE THESE
-  MASTER_LOG_SHEET_ID: "INSERT_YOUR_SPREADSHEET_ID_HERE",
+  MASTER_LOG_SHEET_ID: "1_d-MihtvegIGwBGgwa-ew0YEp5JNgxcgcRx4jryjsIs",
   UPLOAD_FOLDER_ID: "0AKNF15Nmiqz0Uk9PVA",
   MASTER_TAB_NAME: "Leads",
-  SECRET_TOKEN: "SET_A_LONG_SECURE_TOKEN_HERE",
+  SECRET_TOKEN: "a3-secure-token-2026-xyz",
   
   // Columns Mapping for header creation
   COLUMNS: [
