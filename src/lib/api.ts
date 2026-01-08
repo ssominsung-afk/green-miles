@@ -1,8 +1,8 @@
 import { OrderRequestData, CustomRequestData } from './types';
 
 // Apps Script Web App URL (Simon's Account)
-const CRM_URL = process.env.NEXT_PUBLIC_CRM_URL || "https://script.google.com/macros/s/AKfycbz_XXXXXXXXXX_XXXXXXX/exec"; // REPLACE THIS after deployment
-const CRM_TOKEN = process.env.NEXT_PUBLIC_CRM_TOKEN || "a3-secure-token-2026-xyz"; // NEW SECRET TOKEN
+const CRM_URL = process.env.NEXT_PUBLIC_CRM_URL || "https://script.google.com/macros/s/AKfycbzdLra2K3XEwYEstv8VE7m-oP2LlSLDBgHmqpQpJ2W62cI9PQUMZni72zIkh837vycamg/exec";
+const CRM_TOKEN = process.env.NEXT_PUBLIC_CRM_TOKEN || "a3-secure-token-2026-xyz";
 
 export async function submitOrder(data: OrderRequestData) {
     if (!CRM_URL) throw new Error("CRM URL is not configured");
