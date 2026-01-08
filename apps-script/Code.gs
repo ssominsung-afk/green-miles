@@ -4,90 +4,170 @@
  */
 
 const CONFIG = {
-  // SETTINGS - UPDATE THESE
+  // SETTINGS
   MASTER_LOG_SHEET_ID: "1_d-MihtvegIGwBGgwa-ew0YEp5JNgxcgcRx4jryjsIs",
   UPLOAD_FOLDER_ID: "0AKNF15Nmiqz0Uk9PVA",
-  MASTER_TAB_NAME: "Leads",
   SECRET_TOKEN: "a3-secure-token-2026-xyz",
   
-  // Columns Mapping for header creation
-  COLUMNS: [
-    "Timestamp", 
-    "Type", 
-    "Company", 
-    "Name", 
-    "Email", 
-    "Phone", 
-    "Notes", 
-    "Attachment Links", 
-    "Attachment Count", 
-    "Drive Folder Link"
+  // Tab Names
+  TAB_STANDARD: "Standard Orders",
+  TAB_CUSTOM: "Custom Quotes",
+  
+  // Column Definitions
+  COLS_STANDARD: [
+    "Timestamp", "Name", "Company", "Email", "Phone", "ZIP Code", 
+    "Pallet Type", "Quantity", "Frequency", "Delivery Method", "Notes"
+  ],
+  COLS_CUSTOM: [
+    "Timestamp", "Name", "Company", "Email", "Phone", "ZIP Code", 
+    "Dimensions", "Design Style", "Heat Treatment", "Quantity", 
+    "Load Weight", "Wood Type", "Design Notes", "Attachment Links"
   ]
 };
 
-/**
- * Handle POST request from Next.js API
- */
+function doGet(e) {
+  return ContentService.createTextOutput("CRM System Online v2");
+}
+
 function doPost(e) {
   try {
     const rawData = e.postData.contents;
     const data = JSON.parse(rawData);
     
-    // 1. Security Token Validation
+    // 1. Security Check
     if (!data.token || data.token !== CONFIG.SECRET_TOKEN) {
       return responseError("403 Unauthorized", 403);
     }
 
-    // 2. Open Master Sheet and Tab
+    // 2. Open Spreadsheet
     const ss = SpreadsheetApp.openById(CONFIG.MASTER_LOG_SHEET_ID);
-    let sheet = ss.getSheetByName(CONFIG.MASTER_TAB_NAME);
     
-    if (!sheet) {
-      sheet = ss.insertSheet(CONFIG.MASTER_TAB_NAME);
-      sheet.appendRow(CONFIG.COLUMNS);
-      sheet.getRange(1, 1, 1, CONFIG.COLUMNS.length).setFontWeight("bold");
+    // 3. Process Logic based on Type
+    if (data.type === "custom_quote") {
+      handleCustomOrder(ss, data);
+    } else {
+      // Default to Standard Order
+      handleStandardOrder(ss, data);
     }
 
-    // 3. Process Attachments
-    const attachmentLinks = [];
-    if (data.files && Array.isArray(data.files)) {
-      const folder = DriveApp.getFolderById(CONFIG.UPLOAD_FOLDER_ID);
-      
-      data.files.forEach(fileObj => {
-        if (fileObj.base64 && fileObj.name) {
-          const decoded = Utilities.base64Decode(fileObj.base64);
-          const blob = Utilities.newBlob(decoded, fileObj.mimeType || "application/octet-stream", fileObj.name);
-          const file = folder.createFile(blob);
-          attachmentLinks.push(file.getUrl());
-        }
-      });
-    }
-
-    // 4. Prepare Row Data
-    const rowData = [
-      data.timestamp || new Date().toISOString(),
-      data.type || "unknown",
-      data.company || "",
-      data.name || "",
-      data.email || "",
-      data.phone || "",
-      data.notes || "",
-      attachmentLinks.join("\n"),
-      attachmentLinks.length,
-      `https://drive.google.com/drive/folders/${CONFIG.UPLOAD_FOLDER_ID}`
-    ];
-
-    // 5. Append to Sheet
-    sheet.appendRow(rowData);
-
-    return responseSuccess({
-      success: true,
-      attachments: attachmentLinks
-    });
+    return responseSuccess({ success: true });
 
   } catch (err) {
     console.error("Critical Error: " + err.toString());
     return responseError(err.toString(), 500);
+  }
+}
+
+function handleStandardOrder(ss, data) {
+  let sheet = ensureSheet(ss, CONFIG.TAB_STANDARD, CONFIG.COLS_STANDARD);
+  
+  const row = [
+    data.timestamp || new Date().toISOString(),
+    data.name,
+    data.company,
+    data.email,
+    data.phone,
+    data.zip,
+    data.palletType,
+    data.quantity,
+    data.frequency,
+    data.deliveryMode,
+    data.notes
+  ];
+  
+  sheet.appendRow(row);
+  sendEmailNotification(data, [], "Standard Order");
+}
+
+function handleCustomOrder(ss, data) {
+  let sheet = ensureSheet(ss, CONFIG.TAB_CUSTOM, CONFIG.COLS_CUSTOM);
+  
+  // Handle Attachments
+  const links = processAttachments(data);
+  
+  const row = [
+    data.timestamp || new Date().toISOString(),
+    data.name,
+    data.company,
+    data.email,
+    data.phone,
+    data.zip,
+    data.dimensions,
+    data.designType,
+    data.heatTreated,
+    data.quantity,
+    data.loadRating,
+    data.woodType,
+    data.notes,
+    links.join(", ")
+  ];
+  
+  sheet.appendRow(row);
+  sendEmailNotification(data, links, "Custom Quote");
+}
+
+function ensureSheet(ss, tabName, headers) {
+  let sheet = ss.getSheetByName(tabName);
+  if (!sheet) {
+    sheet = ss.insertSheet(tabName);
+    sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function processAttachments(data) {
+  const links = [];
+  if (data.files && Array.isArray(data.files) && data.files.length > 0) {
+    const folder = DriveApp.getFolderById(CONFIG.UPLOAD_FOLDER_ID);
+    data.files.forEach(fileObj => {
+      if (fileObj.base64 && fileObj.name) {
+        const decoded = Utilities.base64Decode(fileObj.base64);
+        const blob = Utilities.newBlob(decoded, fileObj.mimeType, fileObj.name);
+        const file = folder.createFile(blob);
+        links.push(file.getUrl());
+      }
+    });
+  }
+  return links;
+}
+
+function sendEmailNotification(data, links, typeLabel) {
+  try {
+    const recipient = "sales@a3pallet.com";
+    const subject = `[New Request] ${typeLabel} - ${data.company}`;
+    
+    let body = `New ${typeLabel} Received\n\n`;
+    body += `From: ${data.name} (${data.company})\n`;
+    body += `Email: ${data.email}\n`;
+    body += `Phone: ${data.phone}\n`;
+    body += `ZIP: ${data.zip}\n\n`;
+    
+    if (data.type === "custom_quote") {
+      body += `Specs: ${data.dimensions}\n`;
+      body += `Design: ${data.designType}\n`;
+      body += `Qty: ${data.quantity}\n`;
+    } else {
+      body += `Type: ${data.palletType}\n`;
+      body += `Qty: ${data.quantity}\n`;
+      body += `Freq: ${data.frequency}\n`;
+    }
+    
+    body += `\nNotes: ${data.notes}\n`;
+    
+    if (links.length > 0) {
+      body += `\nAttachments:\n${links.join("\n")}`;
+    }
+
+    MailApp.sendEmail({
+      to: recipient,
+      subject: subject,
+      body: body,
+      replyTo: data.email
+    });
+  } catch (e) {
+    console.error("Email processing failed: " + e.toString());
   }
 }
 
