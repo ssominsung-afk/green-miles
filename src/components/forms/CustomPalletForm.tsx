@@ -50,10 +50,21 @@ export function CustomPalletForm() {
             alert("Please wait for the file to finish processing.");
             return;
         }
-        console.log("Submitting Custom Request:", data);
+
+        // Prepare the payload with the new files array structure
+        const submissionData = {
+            ...data,
+            files: data.fileData ? [{
+                name: data.fileName || 'unnamed',
+                mimeType: data.fileType || 'application/octet-stream',
+                base64: data.fileData
+            }] : []
+        };
+
+        console.log("Submitting Custom Request:", submissionData);
         setIsSubmitting(true);
         try {
-            await submitCustomRequest(data);
+            await submitCustomRequest(submissionData as any);
             setSubmitStatus('success');
             trackLead('quote');
             form.reset();
@@ -70,6 +81,7 @@ export function CustomPalletForm() {
             <div className="bg-blue-50 p-6 rounded-lg text-center border border-blue-200">
                 <h3 className="text-xl font-semibold text-blue-800 mb-2">Design Request Sent</h3>
                 <p className="text-blue-700">Our design team will review your specs and contact you to discuss the blueprint.</p>
+                <p className="text-[12px] text-blue-600 mt-2 italic">Attached files are being synced to our secure master log.</p>
                 <Button onClick={() => setSubmitStatus('idle')} variant="outline" className="mt-4">Submit Another</Button>
             </div>
         );
@@ -78,6 +90,7 @@ export function CustomPalletForm() {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* ... existing fields ... */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                         control={form.control}
@@ -256,15 +269,15 @@ export function CustomPalletForm() {
                 />
 
                 <div className="space-y-2">
-                    <FormLabel>Attach Drawing or Specs (Optional, Max 2MB)</FormLabel>
+                    <FormLabel>Attach Drawing or Specs (Optional, Max 10MB)</FormLabel>
                     <Input
                         type="file"
                         accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                         onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) {
-                                if (file.size > 2 * 1024 * 1024) {
-                                    alert("File size exceeds 2MB limit.");
+                                if (file.size > 10 * 1024 * 1024) {
+                                    alert("File size exceeds 10MB limit.");
                                     e.target.value = "";
                                     return;
                                 }
@@ -294,7 +307,7 @@ export function CustomPalletForm() {
                     <p className="text-[10px] text-muted-foreground">Supported: PDF, Images, Word docs.</p>
                 </div>
 
-                {/* Hidden fields to ensure registration */}
+                {/* Hidden fields for internal state */}
                 <input type="hidden" {...form.register('fileData')} />
                 <input type="hidden" {...form.register('fileName')} />
                 <input type="hidden" {...form.register('fileType')} />

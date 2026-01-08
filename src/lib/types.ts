@@ -29,9 +29,16 @@ export const customRequestSchema = z.object({
     heatTreated: z.enum(["Yes", "No", "Not sure"]),
     quantity: z.string().min(1, "Quantity is required"),
     notes: z.string().optional(),
+    // Individual file fields (optional/legacy)
     fileData: z.string().optional(),
     fileName: z.string().optional(),
     fileType: z.string().optional(),
+    // New array structure for Apps Script
+    files: z.array(z.object({
+        name: z.string(),
+        mimeType: z.string(),
+        base64: z.string()
+    })).optional(),
 });
 
 export type OrderRequestData = z.infer<typeof orderRequestSchema>;
