@@ -13,6 +13,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
         '/pallets',
         '/privacy',
         '/service-areas',
+        '/service-areas/college-park-ga',
+        '/service-areas/covington-ga',
+        '/service-areas/douglasville-ga',
+        '/service-areas/duluth-ga',
+        '/service-areas/stockbridge-ga',
+        '/service-areas/suwanee-ga',
         '/shipping',
         '/terms',
     ]
