@@ -14,7 +14,7 @@ export default function SMSOptInForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.consent) return;
+        // if (!formData.consent) return; // Removed to make it optional
 
         setStatus('submitting');
 
@@ -92,13 +92,12 @@ export default function SMSOptInForm() {
                 <input
                     type="checkbox"
                     id="consent"
-                    required
                     checked={formData.consent}
                     onChange={(e) => setFormData({ ...formData, consent: e.target.checked })}
                     className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                 />
                 <label htmlFor="consent" className="text-sm text-slate-600 leading-tight">
-                    I agree to receive SMS text messages from {COMPANY_NAME} for internal operational alerts (new quote/order request notifications). Msg frequency varies (typically 0–10/day). Msg & data rates may apply. Reply STOP to opt out, HELP for help. <span className="text-red-500">*</span>
+                    (Optional) I agree to receive SMS text messages from {COMPANY_NAME} for internal operational alerts (new quote/order request notifications). Msg frequency varies (typically 0–10/day). Msg & data rates may apply. Reply STOP to opt out, HELP for help.
                 </label>
             </div>
 
