@@ -17,9 +17,16 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { trackLead } from '@/lib/gtm';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export function CustomPalletForm() {
+interface CustomPalletFormProps {
+    isAdvancedMode?: boolean;
+    specData?: any;
+    pdfDataUrl?: string | null;
+    onToggleAdvanced?: () => void;
+}
+
+export function CustomPalletForm({ isAdvancedMode, specData, pdfDataUrl, onToggleAdvanced }: CustomPalletFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isReadingFile, setIsReadingFile] = useState(false);
     const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -47,19 +54,41 @@ export function CustomPalletForm() {
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+    useEffect(() => {
+        if (isAdvancedMode && specData) {
+            form.setValue('dimensions', `${specData.length} x ${specData.width} x ${specData.overallHeight.toFixed(1)}`);
+            let notes = `[Advanced Spec Attached]\nTop Decks: ${specData.topDeckCount}, Bottom: ${specData.bottomDeckCount}\nStringers: ${specData.stringerCount}\nTruck Qty: ${specData.truckQty}`;
+            if (specData.customBoardSize) notes += `\nCustom Note: ${specData.customBoardSize}`;
+            form.setValue('notes', notes);
+            form.setValue('designType', specData.palletType.includes('Block') ? 'Block' : 'Stringer');
+            form.setValue('heatTreated', specData.ht === 'Yes' ? 'Yes' : 'No');
+        }
+    }, [isAdvancedMode, specData, form]);
+
+    useEffect(() => {
+        if (pdfDataUrl) {
+            form.setValue('fileName', 'A3_Pallet_Spec_Sheet.pdf');
+            form.setValue('fileType', 'application/pdf');
+            form.setValue('fileData', pdfDataUrl.split(',')[1] || '');
+        }
+    }, [pdfDataUrl, form]);
+
     async function onSubmit(data: CustomRequestData) {
         if (isReadingFile) {
             alert("Please wait for the file to finish processing.");
             return;
         }
 
+        // Collect attached file from RHF state
+        const filesToSubmit = [...(data.fileData ? [{
+            name: data.fileName || 'unnamed',
+            mimeType: data.fileType || 'application/octet-stream',
+            base64: data.fileData
+        }] : [])];
+
         const submissionData = {
             ...data,
-            files: data.fileData ? [{
-                name: data.fileName || 'unnamed',
-                mimeType: data.fileType || 'application/octet-stream',
-                base64: data.fileData
-            }] : []
+            files: filesToSubmit
         };
 
         console.log("Submitting Custom Request:", submissionData);
@@ -93,6 +122,21 @@ export function CustomPalletForm() {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                 {/* Dual-Track Banner */}
+                 {!isAdvancedMode ? (
+                     <div className="bg-primary/5 rounded-xl p-4 border flex flex-col items-center justify-center text-center space-y-3">
+                         <span className="text-sm font-semibold">Need precise drawings?</span>
+                         <Button type="button" onClick={onToggleAdvanced} className="bg-[#004d3d] hover:bg-[#004d3d]/90 text-white shadow-md">
+                              Open 3D Builder Mode
+                         </Button>
+                     </div>
+                 ) : (
+                     <div className="bg-[#004d3d]/5 rounded-xl p-4 border border-[#004d3d]/20 flex flex-col items-center justify-center text-center space-y-2">
+                         <span className="text-[#004d3d] font-bold text-sm">✓ Advanced Mode Active</span>
+                         <span className="text-xs text-[#004d3d]/80">Dimensions and design specs are synced with the 3D Builder.</span>
+                         <Button type="button" onClick={onToggleAdvanced} variant="outline" className="text-xs h-7 border-[#004d3d] text-[#004d3d] hover:bg-[#004d3d] hover:text-white">Return to Simple Form</Button>
+                     </div>
+                 )}
                 {/* ... existing fields ... */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
@@ -173,7 +217,7 @@ export function CustomPalletForm() {
                             <FormItem className="col-span-2">
                                 <FormLabel>Dimensions (L x W x H)*</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="e.g. 60 x 60 x 6" {...field} />
+                                    <Input placeholder="e.g. 60 x 60 x 6" {...field} readOnly={isAdvancedMode} className={isAdvancedMode ? "bg-slate-100" : ""} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -188,9 +232,9 @@ export function CustomPalletForm() {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Design Style</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value} disabled={isAdvancedMode}>
                                     <FormControl>
-                                        <SelectTrigger>
+                                        <SelectTrigger className={isAdvancedMode ? "bg-slate-100" : ""}>
                                             <SelectValue placeholder="Select..." />
                                         </SelectTrigger>
                                     </FormControl>
@@ -210,9 +254,9 @@ export function CustomPalletForm() {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Heat Treatment (ISPM-15)</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value} disabled={isAdvancedMode}>
                                     <FormControl>
-                                        <SelectTrigger>
+                                        <SelectTrigger className={isAdvancedMode ? "bg-slate-100" : ""}>
                                             <SelectValue placeholder="Select..." />
                                         </SelectTrigger>
                                     </FormControl>
@@ -264,7 +308,7 @@ export function CustomPalletForm() {
                         <FormItem>
                             <FormLabel>Design Notes</FormLabel>
                             <FormControl>
-                                <Textarea placeholder="Describe the product being shipped, decking gap requirements, specific wood types, etc." className="resize-none" {...field} />
+                                <Textarea placeholder="Describe the product being shipped, decking gap requirements, specific wood types, etc." className={`resize-none ${isAdvancedMode ? 'bg-slate-100' : ''}`} {...field} readOnly={isAdvancedMode} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -273,40 +317,63 @@ export function CustomPalletForm() {
 
                 <div className="space-y-2">
                     <FormLabel>Attach Drawing or Specs (Optional, Max 10MB)</FormLabel>
-                    <Input
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                        onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                                if (file.size > 10 * 1024 * 1024) {
-                                    alert("File size exceeds 10MB limit.");
-                                    e.target.value = "";
-                                    return;
+                    {form.watch('fileName') ? (
+                        <div className="flex items-center justify-between p-3 border rounded-md bg-[#004d3d]/5 border-[#004d3d]/20 transition-all">
+                            <span className="text-sm font-medium text-[#004d3d] flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                                <span className="truncate max-w-[200px]">{form.watch('fileName')}</span>
+                            </span>
+                            <button 
+                                type="button" 
+                                onClick={() => {
+                                    form.setValue('fileName', '');
+                                    form.setValue('fileData', '');
+                                    form.setValue('fileType', '');
+                                    const fileInput = document.getElementById('file-upload-input') as HTMLInputElement;
+                                    if(fileInput) fileInput.value = '';
+                                }}
+                                className="text-[#004d3d] hover:text-red-500 font-bold px-2 rounded hover:bg-red-50 transition-colors"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    ) : (
+                        <Input
+                            id="file-upload-input"
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                    if (file.size > 10 * 1024 * 1024) {
+                                        alert("File size exceeds 10MB limit.");
+                                        e.target.value = "";
+                                        return;
+                                    }
+                                    setIsReadingFile(true);
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                        const base64String = (reader.result as string).split(',')[1];
+                                        form.setValue('fileData', base64String);
+                                        form.setValue('fileName', file.name);
+                                        form.setValue('fileType', file.type);
+                                        setIsReadingFile(false);
+                                    };
+                                    reader.onerror = () => {
+                                        alert("Error reading file.");
+                                        setIsReadingFile(false);
+                                    };
+                                    reader.readAsDataURL(file);
+                                } else {
+                                    form.setValue('fileData', '');
+                                    form.setValue('fileName', '');
+                                    form.setValue('fileType', '');
+                                    setIsReadingFile(false);
                                 }
-                                setIsReadingFile(true);
-                                const reader = new FileReader();
-                                reader.onloadend = () => {
-                                    const base64String = (reader.result as string).split(',')[1];
-                                    form.setValue('fileData', base64String);
-                                    form.setValue('fileName', file.name);
-                                    form.setValue('fileType', file.type);
-                                    setIsReadingFile(false);
-                                };
-                                reader.onerror = () => {
-                                    alert("Error reading file.");
-                                    setIsReadingFile(false);
-                                };
-                                reader.readAsDataURL(file);
-                            } else {
-                                form.setValue('fileData', '');
-                                form.setValue('fileName', '');
-                                form.setValue('fileType', '');
-                                setIsReadingFile(false);
-                            }
-                        }}
-                        className="cursor-pointer"
-                    />
+                            }}
+                            className="cursor-pointer"
+                        />
+                    )}
                     <p className="text-[10px] text-muted-foreground">Supported: PDF, Images, Word docs.</p>
                 </div>
 
