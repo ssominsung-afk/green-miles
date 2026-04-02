@@ -374,7 +374,7 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
             const { width: cw, height: ch } = resizeCanvas(canvas);
             ctx.clearRect(0,0,cw,ch); ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,cw,ch);
 
-            const marginX = 35; const marginY = 30; 
+            const marginX = 50; const marginY = 50; 
             const drawAreaW = cw - marginX * 2; const drawAreaH = ch - marginY * 2;
             const scale = Math.min(drawAreaW / specs.width, drawAreaH / specs.length);
             const palletW = specs.width * scale; const palletH = specs.length * scale;
@@ -431,8 +431,8 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
              const { width: cw, height: ch } = resizeCanvas(canvas);
              ctx.clearRect(0,0,cw,ch); ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,cw,ch);
 
-             const scaleX = (cw - 60) / specs.length;
-             const scaleY = Math.min((ch - 40) / specs.overallHeight, scaleX * 5);
+             const scaleX = (cw - 100) / specs.length;
+             const scaleY = Math.min((ch - 60) / specs.overallHeight, scaleX * 5);
              const drawW = specs.length * scaleX; const drawH = specs.overallHeight * scaleY;
              const x = (cw - drawW) / 2; const y = (ch - drawH) / 2;
 
@@ -495,7 +495,7 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
                  const bwPx = bw * scaleX; const bt = specs.topThicknesses[idx] * scaleY;
                  // Prevent text overlapping if boards are super tiny, but usually ok
                  if (bwPx > 15) {
-                     ctx.fillText(`${trim0(specs.topThicknesses[idx])}"T`, cursor + bwPx/2, stringerY - bt - 8);
+                     ctx.fillText(`${trim0(specs.topThicknesses[idx])}"T`, cursor + bwPx/2, Math.max(y + 12, stringerY - bt - 8));
                  }
                  cursor += bwPx + (specs.topWidths.length>1 ? Math.max(0, specs.length - specs.topWidths.reduce((a,b)=>a+b,0))/(specs.topWidths.length-1)*scaleX : 0);
              });
@@ -504,7 +504,7 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
              specs.bottomWidths.forEach((bw, idx) => {
                  const bwPx = bw * scaleX; const bt = specs.bottomThicknesses[idx] * scaleY;
                  if (bwPx > 15) {
-                     ctx.fillText(`${trim0(specs.bottomThicknesses[idx])}"T`, cursor + bwPx/2, bottomY + bt + 8);
+                     ctx.fillText(`${trim0(specs.bottomThicknesses[idx])}"T`, cursor + bwPx/2, Math.min(y + drawH - 12, bottomY + bt + 8));
                  }
                  cursor += bwPx + (specs.bottomWidths.length>1 ? Math.max(0, specs.length - specs.bottomWidths.reduce((a,b)=>a+b,0))/(specs.bottomWidths.length-1)*scaleX : 0);
              });
