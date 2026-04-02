@@ -374,7 +374,7 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
             const { width: cw, height: ch } = resizeCanvas(canvas);
             ctx.clearRect(0,0,cw,ch); ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,cw,ch);
 
-            const marginX = 50; const marginY = 50; 
+            const marginX = 38; const marginY = 38; 
             const drawAreaW = cw - marginX * 2; const drawAreaH = ch - marginY * 2;
             const scale = Math.min(drawAreaW / specs.width, drawAreaH / specs.length);
             const palletW = specs.width * scale; const palletH = specs.length * scale;
