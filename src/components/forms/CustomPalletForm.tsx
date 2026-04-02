@@ -46,6 +46,7 @@ export function CustomPalletForm({ isAdvancedMode, specData, pdfDataUrl, onToggl
             heatTreated: 'No',
             quantity: '',
             notes: '',
+            additionalNotes: '',
             fileData: '',
             fileName: '',
             fileType: '',
@@ -58,6 +59,8 @@ export function CustomPalletForm({ isAdvancedMode, specData, pdfDataUrl, onToggl
         if (isAdvancedMode && specData) {
             form.setValue('dimensions', `${specData.length} x ${specData.width} x ${specData.overallHeight.toFixed(1)}`);
             let notes = `[Advanced Spec Attached]\nTop Decks: ${specData.topDeckCount}, Bottom: ${specData.bottomDeckCount}\nStringers: ${specData.stringerCount}\nTruck Qty: ${specData.truckQty}`;
+            notes += `\nTop Leads: ${specData.topLeadThickness}" x ${specData.topLeadWidth}" (Interior: ${specData.topDeckThickness}" x ${specData.topDeckWidth}")`;
+            notes += `\nBot Leads: ${specData.bottomLeadThickness}" x ${specData.bottomLeadWidth}" (Interior: ${specData.bottomDeckThickness}" x ${specData.bottomDeckWidth}")`;
             if (specData.customBoardSize) notes += `\nCustom Note: ${specData.customBoardSize}`;
             form.setValue('notes', notes);
             form.setValue('designType', specData.palletType.includes('Block') ? 'Block' : 'Stringer');
@@ -86,8 +89,14 @@ export function CustomPalletForm({ isAdvancedMode, specData, pdfDataUrl, onToggl
             base64: data.fileData
         }] : [])];
 
+        // Merge Notes
+        const finalNotes = data.additionalNotes 
+            ? `${data.notes}\n\n--- Customer Comments ---\n${data.additionalNotes}`
+            : data.notes;
+
         const submissionData = {
             ...data,
+            notes: finalNotes,
             files: filesToSubmit
         };
 
@@ -301,19 +310,42 @@ export function CustomPalletForm({ isAdvancedMode, specData, pdfDataUrl, onToggl
                     />
                 </div>
 
-                <FormField
-                    control={form.control}
-                    name="notes"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Design Notes</FormLabel>
-                            <FormControl>
-                                <Textarea placeholder="Describe the product being shipped, decking gap requirements, specific wood types, etc." className={`resize-none ${isAdvancedMode ? 'bg-slate-100' : ''}`} {...field} readOnly={isAdvancedMode} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                        control={form.control}
+                        name="notes"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-[#004d3d] font-bold">Auto-Generated Design Specs</FormLabel>
+                                <FormControl>
+                                    <Textarea 
+                                        {...field} 
+                                        readOnly={isAdvancedMode} 
+                                        className={`resize-none h-32 text-xs font-mono ${isAdvancedMode ? 'bg-slate-50' : ''}`} 
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="additionalNotes"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-[#004d3d] font-bold underline">Your Additional Requirements / Notes</FormLabel>
+                                <FormControl>
+                                    <Textarea 
+                                        placeholder="Add any specific requirements, delivery notes, or questions here..." 
+                                        className="resize-none h-32" 
+                                        {...field} 
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
 
                 <div className="space-y-2">
                     <FormLabel>Attach Drawing or Specs (Optional, Max 10MB)</FormLabel>

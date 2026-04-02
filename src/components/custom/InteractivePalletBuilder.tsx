@@ -17,8 +17,10 @@ export interface PalletSpecs {
     stringerCount: number;
     stringerWidth: number;
     stringerHeight: number;
-    deckboardWidth: number;
-    deckboardThickness: number;
+    topDeckWidth: number;
+    topDeckThickness: number;
+    bottomDeckWidth: number;
+    bottomDeckThickness: number;
     customBoardSize: string;
     topWidths: number[];
     bottomWidths: number[];
@@ -29,8 +31,10 @@ export interface PalletSpecs {
     nailCount: number;
     overallHeight: number;
     truckQty: number;
-    leadWidth: number;
-    leadThickness: number;
+    topLeadWidth: number;
+    topLeadThickness: number;
+    bottomLeadWidth: number;
+    bottomLeadThickness: number;
 }
 
 export interface BuilderRef {
@@ -127,15 +131,24 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
     const [stringerCount, setStringerCount] = useState(3);
     const [topDeckCount, setTopDeckCount] = useState(6);
     const [bottomDeckCount, setBottomDeckCount] = useState(3);
-    const [deckWidth, setDeckWidth] = useState(5.5);
-    const [deckThickness, setDeckThickness] = useState(0.75);
-    const [leadWidth, setLeadWidth] = useState(5.5);
-    const [leadThickness, setLeadThickness] = useState(0.75);
+    const [topDeckWidth, setTopDeckWidth] = useState(5.5);
+    const [topDeckThickness, setTopDeckThickness] = useState(0.75);
+    const [bottomDeckWidth, setBottomDeckWidth] = useState(5.5);
+    const [bottomDeckThickness, setBottomDeckThickness] = useState(0.75);
+    const [topLeadWidth, setTopLeadWidth] = useState(5.5);
+    const [topLeadThickness, setTopLeadThickness] = useState(0.75);
+    const [bottomLeadWidth, setBottomLeadWidth] = useState(5.5);
+    const [bottomLeadThickness, setBottomLeadThickness] = useState(0.75);
     const [customBoardSize, setCustomBoardSize] = useState('');
     const [ht, setHt] = useState('No');
 
-    const [leadSDirty, setLeadSDirty] = useState(false);
-    const [leadTDirty, setLeadTDirty] = useState(false);
+    const [topLeadSDirty, setTopLeadSDirty] = useState(false);
+    const [topLeadTDirty, setTopLeadTDirty] = useState(false);
+    const [bottomLeadSDirty, setBottomLeadSDirty] = useState(false);
+    const [bottomLeadTDirty, setBottomLeadTDirty] = useState(false);
+    
+    const [showSplitStd, setShowSplitStd] = useState(false);
+    const [showSplitLead, setShowSplitLead] = useState(false);
 
     const threeContainerRef = useRef<HTMLDivElement>(null);
     const topCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -154,15 +167,20 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
         const bdc = clamp(bottomDeckCount, 2, 14, 3);
         const sc = clamp(stringerCount, 2, 6, 3);
         const sW = 1.5; const sH = 3.5;
-        const dw = clamp(deckWidth, 3, 8, 5.5);
-        const dt = clamp(deckThickness, 0.5, 2, 0.75);
-        const lw = clamp(leadWidth, 3, 8, dw);
-        const lt = clamp(leadThickness, 0.5, 2, dt);
+        const tW = clamp(topDeckWidth, 1, 12, 5.5);
+        const tT = clamp(topDeckThickness, 0.125, 4, 0.75);
+        const bW = clamp(bottomDeckWidth, 1, 12, 5.5);
+        const bT = clamp(bottomDeckThickness, 0.125, 4, 0.75);
         
-        const topWidths = getBoardWidths(tdc, dw, lw);
-        const bottomWidths = getBoardWidths(bdc, dw, lw);
-        const topThicknesses = getBoardThicknesses(tdc, dt, lt);
-        const bottomThicknesses = getBoardThicknesses(bdc, dt, lt);
+        const tlw = clamp(topLeadWidth, 1, 12, tW);
+        const tlt = clamp(topLeadThickness, 0.125, 4, tT);
+        const blw = clamp(bottomLeadWidth, 1, 12, bW);
+        const blt = clamp(bottomLeadThickness, 0.125, 4, bT);
+        
+        const topWidths = getBoardWidths(tdc, tW, tlw);
+        const bottomWidths = getBoardWidths(bdc, bW, blw);
+        const topThicknesses = getBoardThicknesses(tdc, tT, tlt);
+        const bottomThicknesses = getBoardThicknesses(bdc, bT, blt);
 
         const topBF = topWidths.reduce((sum, bw, i) => sum + (topThicknesses[i] * bw * w) / 144, 0);
         const bottomBF = bottomWidths.reduce((sum, bw, i) => sum + (bottomThicknesses[i] * bw * w) / 144, 0);
@@ -170,15 +188,42 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
         const totalBF = topBF + bottomBF + stringerBF;
         const weightLbs = totalBF * WEIGHT_PER_BF[woodType];
         const nailCount = (tdc * sc * TOP_NAILS_PER_INTERSECTION) + (bdc * sc * BOTTOM_NAILS_PER_INTERSECTION);
-        const overallHeight = dt + sH + dt;
+        const overallHeight = tT + sH + bT; // Sum of stringer and both deck thicknesses
         const truckQty = computeTruckCount(w, l);
 
         return {
             length: l, width: w, palletType, woodType, topDeckCount: tdc, bottomDeckCount: bdc, stringerCount: sc,
-            stringerWidth: sW, stringerHeight: sH, deckboardWidth: dw, deckboardThickness: dt, customBoardSize,
+            stringerWidth: sW, stringerHeight: sH, 
+            topDeckWidth: tW, topDeckThickness: tT, bottomDeckWidth: bW, bottomDeckThickness: bT,
+            customBoardSize,
             topWidths, bottomWidths, topThicknesses, bottomThicknesses, ht, weightLbs, nailCount, overallHeight,
-            truckQty, leadWidth: lw, leadThickness: lt
+            truckQty, topLeadWidth: tlw, topLeadThickness: tlt, bottomLeadWidth: blw, bottomLeadThickness: blt
         };
+    };
+
+    const syncStdWidth = (val: number) => {
+        setTopDeckWidth(val);
+        if (!showSplitStd) setBottomDeckWidth(val);
+    };
+    const syncStdThickness = (val: number) => {
+        setTopDeckThickness(val);
+        if (!showSplitStd) setBottomDeckThickness(val);
+    };
+    const syncLeadWidth = (val: number) => {
+        setTopLeadWidth(val);
+        setTopLeadSDirty(true);
+        if (!showSplitLead) {
+            setBottomLeadWidth(val);
+            setBottomLeadSDirty(true);
+        }
+    };
+    const syncLeadThickness = (val: number) => {
+        setTopLeadThickness(val);
+        setTopLeadTDirty(true);
+        if (!showSplitLead) {
+            setBottomLeadThickness(val);
+            setBottomLeadTDirty(true);
+        }
     };
 
     const currentSpecs = computeSpecs();
@@ -236,10 +281,12 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
     useEffect(() => {
         if (onChange) onChange(currentSpecs);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [length, width, palletType, woodType, stringerCount, topDeckCount, bottomDeckCount, deckWidth, deckThickness, leadWidth, leadThickness, customBoardSize, ht]);
+    }, [length, width, palletType, woodType, stringerCount, topDeckCount, bottomDeckCount, topDeckWidth, topDeckThickness, bottomDeckWidth, bottomDeckThickness, topLeadWidth, topLeadThickness, bottomLeadWidth, bottomLeadThickness, customBoardSize, ht]);
 
-    useEffect(() => { if (!leadSDirty) setLeadWidth(deckWidth); }, [deckWidth, leadSDirty]);
-    useEffect(() => { if (!leadTDirty) setLeadThickness(deckThickness); }, [deckThickness, leadTDirty]);
+    useEffect(() => { if (!topLeadSDirty) setTopLeadWidth(topDeckWidth); }, [topDeckWidth, topLeadSDirty]);
+    useEffect(() => { if (!topLeadTDirty) setTopLeadThickness(topDeckThickness); }, [topDeckThickness, topLeadTDirty]);
+    useEffect(() => { if (!bottomLeadSDirty) setBottomLeadWidth(bottomDeckWidth); }, [bottomDeckWidth, bottomLeadSDirty]);
+    useEffect(() => { if (!bottomLeadTDirty) setBottomLeadThickness(bottomDeckThickness); }, [bottomDeckThickness, bottomLeadTDirty]);
 
     // Initialize WebGL
     useEffect(() => {
@@ -405,14 +452,14 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
 
             // Write board dimensions directly inside the slats
             ctx.fillStyle = BRAND_COLOR;
-            ctx.font = 'bold 11px Inter, sans-serif';
+            ctx.font = 'bold 10px Inter, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             let tCursor = y;
             const thicknesses = type === 'Top' ? specs.topThicknesses : specs.bottomThicknesses;
             boards.forEach((bw, idx) => {
                 const bwPx = Math.max(4, bw * scale);
-                if (bwPx >= 14) { // Only render if board is wide enough to fit text cleanly
+                if (bwPx >= 6) { // Lowered threshold from 14 to 6
                     ctx.fillText(`${trim0(thicknesses[idx])}"T x ${trim0(bw)}"W`, x + palletW / 2, tCursor + bwPx / 2);
                 }
                 tCursor += bwPx + (idx < boards.length - 1 ? gapInches * scale : 0);
@@ -561,19 +608,90 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
                     <option value="No">No</option>
                  </select>
             </div>
-            <div className="col-span-2 space-y-1 border-t pt-2 mt-2">
-                <label className="font-semibold text-slate-800">Standard Boards W/T (in)</label>
-                <div className="grid grid-cols-2 gap-2">
-                    <input type="number" step="0.25" value={deckWidth} onChange={e => setDeckWidth(Number(e.target.value))} className="p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d]" placeholder="Width" />
-                    <input type="number" step="0.125" value={deckThickness} onChange={e => setDeckThickness(Number(e.target.value))} className="p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d]" placeholder="Thickness" />
+            {/* Standard Boards Section */}
+            <div className="md:col-span-2 space-y-2 p-3 border border-slate-100 rounded-lg bg-slate-50/50">
+                <div className="flex items-center justify-between">
+                    <label className="font-bold text-[#004d3d] uppercase text-xs tracking-wider">Standard Boards (in)</label>
+                    <button 
+                        onClick={() => setShowSplitStd(!showSplitStd)}
+                        className="text-[10px] text-slate-500 hover:text-[#004d3d] underline flex items-center gap-1"
+                    >
+                        {showSplitStd ? 'Collapse' : 'Split Top/Bottom'}
+                    </button>
                 </div>
+                <div className="grid grid-cols-2 gap-2">
+                    <input 
+                        type="number" step="0.25" 
+                        value={topDeckWidth} 
+                        onChange={e => syncStdWidth(Number(e.target.value))} 
+                        className="p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d] bg-white" 
+                        placeholder="Width" 
+                    />
+                    <input 
+                        type="number" step="0.125" 
+                        value={topDeckThickness} 
+                        onChange={e => syncStdThickness(Number(e.target.value))} 
+                        className="p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d] bg-white" 
+                        placeholder="Thickness" 
+                    />
+                </div>
+                {showSplitStd && (
+                    <div className="pt-2 mt-2 border-t border-slate-200 grid grid-cols-1 gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                        <div className="grid grid-cols-4 items-center gap-2">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">Top</span>
+                            <input type="number" step="0.25" value={topDeckWidth} onChange={e => setTopDeckWidth(Number(e.target.value))} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded" />
+                            <input type="number" step="0.125" value={topDeckThickness} onChange={e => setTopDeckThickness(Number(e.target.value))} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded" />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-2">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">Bot</span>
+                            <input type="number" step="0.25" value={bottomDeckWidth} onChange={e => setBottomDeckWidth(Number(e.target.value))} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded" />
+                            <input type="number" step="0.125" value={bottomDeckThickness} onChange={e => setBottomDeckThickness(Number(e.target.value))} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded" />
+                        </div>
+                    </div>
+                )}
             </div>
-            <div className="col-span-2 space-y-1 border-t pt-2 mt-2">
-                <label className="font-semibold text-slate-800">Lead Boards W/T (in)</label>
-                <div className="grid grid-cols-2 gap-2">
-                    <input type="number" step="0.25" value={leadWidth} onChange={e => {setLeadWidth(Number(e.target.value)); setLeadSDirty(true);}} className="p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d]" placeholder="Width" />
-                    <input type="number" step="0.125" value={leadThickness} onChange={e => {setLeadThickness(Number(e.target.value)); setLeadTDirty(true);}} className="p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d]" placeholder="Thickness" />
+
+            {/* Lead Boards Section */}
+            <div className="md:col-span-2 space-y-2 p-3 border border-slate-100 rounded-lg bg-slate-50/50">
+                <div className="flex items-center justify-between">
+                    <label className="font-bold text-[#004d3d] uppercase text-xs tracking-wider">Lead Boards (in)</label>
+                    <button 
+                        onClick={() => setShowSplitLead(!showSplitLead)}
+                        className="text-[10px] text-slate-500 hover:text-[#004d3d] underline flex items-center gap-1"
+                    >
+                        {showSplitLead ? 'Collapse' : 'Split Top/Bottom'}
+                    </button>
                 </div>
+                <div className="grid grid-cols-2 gap-2">
+                    <input 
+                        type="number" step="0.25" 
+                        value={topLeadWidth} 
+                        onChange={e => syncLeadWidth(Number(e.target.value))} 
+                        className="p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d] bg-white italic" 
+                        placeholder="Width" 
+                    />
+                    <input 
+                        type="number" step="0.125" 
+                        value={topLeadThickness} 
+                        onChange={e => syncLeadThickness(Number(e.target.value))} 
+                        className="p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d] bg-white italic" 
+                        placeholder="Thickness" 
+                    />
+                </div>
+                {showSplitLead && (
+                    <div className="pt-2 mt-2 border-t border-slate-200 grid grid-cols-1 gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                        <div className="grid grid-cols-4 items-center gap-2">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">Top</span>
+                            <input type="number" step="0.25" value={topLeadWidth} onChange={e => {setTopLeadWidth(Number(e.target.value)); setTopLeadSDirty(true);}} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded italic" />
+                            <input type="number" step="0.125" value={topLeadThickness} onChange={e => {setTopLeadThickness(Number(e.target.value)); setTopLeadTDirty(true);}} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded italic" />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-2">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">Bot</span>
+                            <input type="number" step="0.25" value={bottomLeadWidth} onChange={e => {setBottomLeadWidth(Number(e.target.value)); setBottomLeadSDirty(true);}} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded italic" />
+                            <input type="number" step="0.125" value={bottomLeadThickness} onChange={e => {setBottomLeadThickness(Number(e.target.value)); setBottomLeadTDirty(true);}} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded italic" />
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -590,16 +708,16 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
                          <th className="px-4 py-3 bg-slate-50 font-semibold w-1/3 text-slate-600">Top Deckboards</th>
                          <td className="px-4 py-3 text-slate-800">
                              <div className="font-medium text-[#004d3d] mb-1">{currentSpecs.topDeckCount} Boards Total</div>
-                             <div>{trim0(currentSpecs.leadThickness)}"T x {trim0(currentSpecs.leadWidth)}"W (Leads)</div>
-                             <div>{trim0(currentSpecs.deckboardThickness)}"T x {trim0(currentSpecs.deckboardWidth)}"W (Interior)</div>
+                             <div>{trim0(currentSpecs.topLeadThickness)}"T x {trim0(currentSpecs.topLeadWidth)}"W (Leads)</div>
+                             <div>{trim0(currentSpecs.topDeckThickness)}"T x {trim0(currentSpecs.topDeckWidth)}"W (Interior)</div>
                          </td>
                      </tr>
                      <tr className="border-b">
                          <th className="px-4 py-3 bg-slate-50 font-semibold text-slate-600">Bottom Deckboards</th>
                          <td className="px-4 py-3 text-slate-800">
                              <div className="font-medium text-[#004d3d] mb-1">{currentSpecs.bottomDeckCount} Boards Total</div>
-                             <div>{trim0(currentSpecs.leadThickness)}"T x {trim0(currentSpecs.leadWidth)}"W (Leads)</div>
-                             <div>{trim0(currentSpecs.deckboardThickness)}"T x {trim0(currentSpecs.deckboardWidth)}"W (Interior)</div>
+                             <div>{trim0(currentSpecs.bottomLeadThickness)}"T x {trim0(currentSpecs.bottomLeadWidth)}"W (Leads)</div>
+                             <div>{trim0(currentSpecs.bottomDeckThickness)}"T x {trim0(currentSpecs.bottomDeckWidth)}"W (Interior)</div>
                          </td>
                      </tr>
                      <tr className="border-b">
@@ -652,11 +770,11 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
                              <tbody>
                                   <tr>
                                      <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', width: '25%', backgroundColor: '#f8fafc', fontWeight: 'bold', fontSize: '11px', color: '#334155' }}>Top Deck</td>
-                                     <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', fontSize: '11px', color: '#475569' }}>{currentSpecs.topDeckCount} Boards / {trim0(currentSpecs.leadThickness)}"x{trim0(currentSpecs.leadWidth)}" Leads / {trim0(currentSpecs.deckboardThickness)}"x{trim0(currentSpecs.deckboardWidth)}" Inner</td>
+                                     <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', fontSize: '11px', color: '#475569' }}>{currentSpecs.topDeckCount} Boards / {trim0(currentSpecs.topLeadThickness)}"x{trim0(currentSpecs.topLeadWidth)}" Leads / {trim0(currentSpecs.topDeckThickness)}"x{trim0(currentSpecs.topDeckWidth)}" Inner</td>
                                   </tr>
                                   <tr>
                                      <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontWeight: 'bold', fontSize: '11px', color: '#334155' }}>Bottom Deck</td>
-                                     <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', fontSize: '11px', color: '#475569' }}>{currentSpecs.bottomDeckCount} Boards / {trim0(currentSpecs.leadThickness)}"x{trim0(currentSpecs.leadWidth)}" Leads / {trim0(currentSpecs.deckboardThickness)}"x{trim0(currentSpecs.deckboardWidth)}" Inner</td>
+                                     <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', fontSize: '11px', color: '#475569' }}>{currentSpecs.bottomDeckCount} Boards / {trim0(currentSpecs.bottomLeadThickness)}"x{trim0(currentSpecs.bottomLeadWidth)}" Leads / {trim0(currentSpecs.bottomDeckThickness)}"x{trim0(currentSpecs.bottomDeckWidth)}" Inner</td>
                                   </tr>
                                   <tr>
                                      <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontWeight: 'bold', fontSize: '11px', color: '#334155' }}>Stringers/Blocks</td>

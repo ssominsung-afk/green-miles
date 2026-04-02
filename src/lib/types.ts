@@ -29,6 +29,7 @@ export const customRequestSchema = z.object({
     heatTreated: z.enum(["Yes", "No", "Not sure"]),
     quantity: z.string().min(1, "Quantity is required"),
     notes: z.string().optional(),
+    additionalNotes: z.string().optional(),
     // Individual file fields (optional/legacy)
     fileData: z.string().optional(),
     fileName: z.string().optional(),
