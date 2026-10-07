@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Truck } from 'lucide-react';
-import { COMPANY_NAME } from '@/lib/constants';
+import { Truck, Phone, Mail } from 'lucide-react';
+import { COMPANY_NAME, PHONE_NUMBER, COMPANY_EMAILS } from '@/lib/constants';
 
 export default function Footer() {
     return (
@@ -43,11 +43,28 @@ export default function Footer() {
                     </div>
 
                     <div>
+                        <h3 className="font-semibold mb-3">Contact</h3>
+                        <ul className="space-y-3 text-sm text-muted-foreground">
+                            <li>
+                                <a href="tel:+14709627000" className="inline-flex items-center gap-2 font-semibold text-foreground hover:text-primary transition-colors">
+                                    <Phone className="h-4 w-4" /> {PHONE_NUMBER}
+                                </a>
+                                <p className="text-xs mt-1">Mon–Fri, 7:00 AM–4:30 PM EST</p>
+                            </li>
+                            <li>
+                                <a href={`mailto:${COMPANY_EMAILS.SALES}`} className="inline-flex items-center gap-2 hover:text-primary transition-colors">
+                                    <Mail className="h-4 w-4" /> {COMPANY_EMAILS.SALES}
+                                </a>
+                            </li>
+                            <li className="text-xs">Atlanta-based. Serving the Southeast.</li>
+                        </ul>
+                    </div>
+
+                    <div>
                         <h3 className="font-semibold mb-3 text-foreground">Legal</h3>
                         <ul className="space-y-2 text-sm text-muted-foreground">
                             <li><Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
                             <li><Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
-                            <li><Link href="/sms-optin-internal" className="hover:text-primary transition-colors">SMS Opt-In (Internal)</Link></li>
                         </ul>
                     </div>
                 </div>
