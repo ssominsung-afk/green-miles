@@ -1,9 +1,11 @@
+import Link from 'next/link';
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion';
+import QuoteCta from '@/components/layout/QuoteCta';
 
 export const metadata = {
     title: 'Pallet Supply FAQs | Sourcing & Logistics',
@@ -57,7 +59,9 @@ const FAQS = [
     },
     {
         question: "How do I get started?",
-        answer: "Simply submit a 'Request for Quote' via our contact page. We will contact you within the hour to assess your specs, volume, and dock requirements."
+        answer: "Simply submit a 'Request for Quote' via our contact page. We will contact you within the hour to assess your specs, volume, and dock requirements.",
+        ctaLink: "/contact",
+        ctaLabel: "Request for Quote"
     }
 ];
 
@@ -77,10 +81,20 @@ export default function FaqPage() {
                         </AccordionTrigger>
                         <AccordionContent className="text-muted-foreground leading-relaxed pb-6">
                             {faq.answer}
+                            {(faq as any).ctaLink && (
+                                <span>
+                                    {' '}
+                                    <Link href={(faq as any).ctaLink} className="font-semibold text-primary hover:underline">
+                                        {(faq as any).ctaLabel} →
+                                    </Link>
+                                </span>
+                            )}
                         </AccordionContent>
                     </AccordionItem>
                 ))}
             </Accordion>
+
+            <QuoteCta />
 
             <script
                 type="application/ld+json"

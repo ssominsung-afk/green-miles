@@ -254,8 +254,13 @@ export function OrderRequestForm() {
                 />
 
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? 'Sending Request...' : 'Submit Order Request'}
+                    {isSubmitting ? 'Sending Request...' : 'Request My Quote'}
                 </Button>
+                <p className="text-xs text-center text-muted-foreground leading-relaxed">
+                    A pallet specialist will respond within 1 hour during business hours
+                    (Mon–Fri, 7:00 AM–4:30 PM EST). No spam, no obligation — your details
+                    stay with us per our <a href="/privacy" className="underline hover:text-primary">Privacy Policy</a>.
+                </p>
             </form>
         </Form>
     );

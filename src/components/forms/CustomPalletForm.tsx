@@ -417,6 +417,11 @@ export function CustomPalletForm({ isAdvancedMode, specData, pdfDataUrl, onToggl
                 <Button type="submit" className="w-full" variant="secondary" disabled={isSubmitting}>
                     {isSubmitting ? 'Submitting...' : 'Request Custom Quote'}
                 </Button>
+                <p className="text-xs text-center text-muted-foreground leading-relaxed">
+                    Our specialists aim to respond within 1 hour during business hours
+                    (Mon–Fri, 7:00 AM–4:30 PM EST). Your specs stay confidential per our{' '}
+                    <a href="/privacy" className="underline hover:text-primary">Privacy Policy</a>.
+                </p>
                 {errorMessage && (
                     <div className="text-red-600 text-sm text-center mt-2 p-2 bg-red-50 rounded border border-red-200">
                         Error: {errorMessage}

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import QuoteCta from '@/components/layout/QuoteCta';
 
 export const metadata = {
     title: 'Reliable Delivery & Logistics Coordination | A3 Pallet',
@@ -83,6 +84,11 @@ export default function ShippingPage() {
                     </CardContent>
                 </Card>
             </div>
+
+            <QuoteCta
+                title="Need Pallets Delivered on Schedule?"
+                subtitle="Tell us your delivery ZIP and volume — we'll coordinate fulfillment from the nearest partner facility and quote within 1 hour during business hours."
+            />
         </div>
     );
 }

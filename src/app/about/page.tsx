@@ -1,6 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { COMPANY_NAME } from '@/lib/constants';
 import { Truck, Factory, Users, CheckCircle, ShieldCheck } from 'lucide-react';
+import QuoteCta from '@/components/layout/QuoteCta';
 
 export const metadata = {
     title: 'About A3 Pallet | Your Southeast Sourcing Partner',
@@ -88,6 +89,11 @@ export default function AboutPage() {
                     </Card>
                 </div>
             </div>
+
+            <QuoteCta
+                title="Put Our Network to Work for You"
+                subtitle="Join the manufacturers and 3PLs relying on A3 Pallet for accountable, partner-backed pallet supply. Quotes back within 1 hour during business hours."
+            />
         </div>
     );
 }
