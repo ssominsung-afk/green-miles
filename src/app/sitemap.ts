@@ -7,6 +7,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     const routes = [
         '',
         '/about',
+        '/blog',
+        '/blog/ispm15-heat-treated-pallets',
         '/contact',
         '/custom',
         '/faq',

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Truck, Phone, Mail } from 'lucide-react';
-import { COMPANY_NAME, PHONE_NUMBER, COMPANY_EMAILS } from '@/lib/constants';
+import { Truck, Linkedin, Mail } from 'lucide-react';
+import { COMPANY_NAME, LINKEDIN_URL, COMPANY_EMAILS } from '@/lib/constants';
 
 export default function Footer() {
     return (
@@ -37,6 +37,7 @@ export default function Footer() {
                         <h3 className="font-semibold mb-3">Resources</h3>
                         <ul className="space-y-2 text-sm text-muted-foreground">
                             <li><Link href="/faq">FAQ</Link></li>
+                            <li><Link href="/blog">Blog</Link></li>
                             <li><Link href="/shipping">Shipping & Delivery</Link></li>
                             <li><Link href="/custom">Custom Specs</Link></li>
                         </ul>
@@ -46,10 +47,10 @@ export default function Footer() {
                         <h3 className="font-semibold mb-3">Contact</h3>
                         <ul className="space-y-3 text-sm text-muted-foreground">
                             <li>
-                                <a href="tel:+14709627000" className="inline-flex items-center gap-2 font-semibold text-foreground hover:text-primary transition-colors">
-                                    <Phone className="h-4 w-4" /> {PHONE_NUMBER}
+                                <a href={LINKEDIN_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 font-semibold text-foreground hover:text-primary transition-colors">
+                                    <Linkedin className="h-4 w-4" /> LinkedIn
                                 </a>
-                                <p className="text-xs mt-1">Mon–Fri, 7:00 AM–4:30 PM EST</p>
+                                <p className="text-xs mt-1">Message us directly</p>
                             </li>
                             <li>
                                 <a href={`mailto:${COMPANY_EMAILS.SALES}`} className="inline-flex items-center gap-2 hover:text-primary transition-colors">
