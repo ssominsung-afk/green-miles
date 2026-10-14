@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Truck, Linkedin, Mail } from 'lucide-react';
-import { COMPANY_NAME, LINKEDIN_URL, COMPANY_EMAILS } from '@/lib/constants';
+import { Truck, Linkedin, Instagram, Mail } from 'lucide-react';
+import { COMPANY_NAME, LINKEDIN_URL, INSTAGRAM_URL, COMPANY_EMAILS } from '@/lib/constants';
 
 export default function Footer() {
     return (
@@ -51,6 +51,11 @@ export default function Footer() {
                                     <Linkedin className="h-4 w-4" /> LinkedIn
                                 </a>
                                 <p className="text-xs mt-1">Message us directly</p>
+                            </li>
+                            <li>
+                                <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 font-semibold text-foreground hover:text-primary transition-colors">
+                                    <Instagram className="h-4 w-4" /> Instagram
+                                </a>
                             </li>
                             <li>
                                 <a href={`mailto:${COMPANY_EMAILS.SALES}`} className="inline-flex items-center gap-2 hover:text-primary transition-colors">
