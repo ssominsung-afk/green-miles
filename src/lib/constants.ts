@@ -3,7 +3,8 @@ export const COMPANY_EMAILS = {
     SALES: "sales@a3pallet.com",
     SUPPORT: "sales@a3pallet.com"
 };
-export const PHONE_NUMBER = "(470) 962-7000";
+export const LINKEDIN_URL = "https://www.linkedin.com/company/a3-pallet";
+export const INSTAGRAM_URL = "https://www.instagram.com/a3pallet";
 export const ADDRESS = "Serving the Southeastern United States";
 
 export const NAV_LINKS = [
