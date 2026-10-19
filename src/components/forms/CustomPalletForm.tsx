@@ -61,6 +61,10 @@ export function CustomPalletForm({ isAdvancedMode, specData, pdfDataUrl, onToggl
             let notes = `[Advanced Spec Attached]\nTop Decks: ${specData.topDeckCount}, Bottom: ${specData.bottomDeckCount}\nStringers: ${specData.stringerCount}\nTruck Qty: ${specData.truckQty}`;
             notes += `\nTop Leads: ${specData.topLeadThickness}" x ${specData.topLeadWidth}" (Interior: ${specData.topDeckThickness}" x ${specData.topDeckWidth}")`;
             notes += `\nBot Leads: ${specData.bottomLeadThickness}" x ${specData.bottomLeadWidth}" (Interior: ${specData.bottomDeckThickness}" x ${specData.bottomDeckWidth}")`;
+            if (specData.dynamicLoadLbs && specData.staticLoadLbs) {
+                notes += `\nEst. Load Capacity: Dynamic ~${specData.dynamicLoadLbs.toLocaleString()} lbs / Static ~${specData.staticLoadLbs.toLocaleString()} lbs`;
+                form.setValue('loadRating', `~${specData.dynamicLoadLbs.toLocaleString()} lbs (Dynamic) / ~${specData.staticLoadLbs.toLocaleString()} lbs (Static)`);
+            }
             if (specData.customBoardSize) notes += `\nCustom Note: ${specData.customBoardSize}`;
             form.setValue('notes', notes);
             form.setValue('designType', specData.palletType.includes('Block') ? 'Block' : 'Stringer');

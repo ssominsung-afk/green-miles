@@ -35,6 +35,8 @@ export interface PalletSpecs {
     topLeadThickness: number;
     bottomLeadWidth: number;
     bottomLeadThickness: number;
+    dynamicLoadLbs: number;
+    staticLoadLbs: number;
 }
 
 export interface BuilderRef {
@@ -76,6 +78,54 @@ function computeTruckCount(width: number, length: number) {
     const a = Math.floor(TRUCK.length / length) * Math.floor(TRUCK.width / width);
     const b = Math.floor(TRUCK.length / width) * Math.floor(TRUCK.width / length);
     return Math.max(a, b);
+}
+
+function computeLoadCapacity(
+    length: number,
+    width: number,
+    palletType: string,
+    woodType: string,
+    topWidths: number[],
+    topThicknesses: number[],
+    bottomWidths: number[],
+    stringerCount: number,
+    stringerWidth: number,
+    stringerHeight: number
+) {
+    // 1. Top Deck Strength
+    const topDeckWidthTotal = topWidths.reduce((a, b) => a + b, 0);
+    const topDeckAvgThickness = topWidths.reduce((sum, w, i) => sum + w * (topThicknesses[i] || 0.75), 0) / (topDeckWidthTotal || 1);
+    const deckSpan = Math.max(8, (width - stringerCount * stringerWidth) / Math.max(1, stringerCount - 1));
+    const spanFactor = Math.pow(17.75 / deckSpan, 0.75);
+    const thicknessFactor = Math.pow(topDeckAvgThickness / 0.55, 1.8);
+    const coverageFactor = topDeckWidthTotal / 28.5;
+    const fDeck = coverageFactor * thicknessFactor * spanFactor;
+
+    // 2. Stringer / Block Support Strength
+    const stringerCountFactor = stringerCount / 3;
+    const lengthSpanFactor = Math.pow(48 / length, 0.9);
+    const stringerDimFactor = (stringerWidth * Math.pow(stringerHeight, 2)) / (1.5 * 12.25);
+    const typeFactor = palletType === '4-way' ? 0.85 : palletType === 'Block Pallet' ? 1.15 : 1.0;
+    const fStringer = stringerCountFactor * lengthSpanFactor * stringerDimFactor * typeFactor;
+
+    // 3. Wood Material Factor
+    const woodFactor = woodType === 'Recycled' ? 0.82 : 1.0;
+
+    // 4. Dynamic (Working / Forklift) Load Capacity
+    // Standard GMA 48x40 #1 benchmark is 2,500 lbs
+    const fDynamic = 0.55 * fStringer + 0.45 * fDeck;
+    const fDeckFloor = fDeck * 1.35;
+    const fDynamicEffective = Math.min(fDynamic, fDeckFloor) * woodFactor;
+    let dynamicLoadLbs = Math.round((2500 * fDynamicEffective) / 50) * 50;
+    dynamicLoadLbs = Math.max(1000, Math.min(6500, dynamicLoadLbs));
+
+    // 5. Static (Floor / Stationary Stack) Load Capacity
+    const botDeckWidthTotal = bottomWidths.reduce((a, b) => a + b, 0);
+    const fBottom = 0.85 + 0.15 * (botDeckWidthTotal / 16.5);
+    let staticLoadLbs = Math.round((dynamicLoadLbs * 2.3 * fBottom) / 100) * 100;
+    staticLoadLbs = Math.max(2000, Math.min(15000, staticLoadLbs));
+
+    return { dynamicLoadLbs, staticLoadLbs };
 }
 function trim0(v: number | string) { return parseFloat(Number(v).toFixed(3)); }
 function getStringerPositions(count: number, palletWidth: number, stringerWidth: number) {
@@ -190,6 +240,9 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
         const nailCount = (tdc * sc * TOP_NAILS_PER_INTERSECTION) + (bdc * sc * BOTTOM_NAILS_PER_INTERSECTION);
         const overallHeight = tT + sH + bT; // Sum of stringer and both deck thicknesses
         const truckQty = computeTruckCount(w, l);
+        const { dynamicLoadLbs, staticLoadLbs } = computeLoadCapacity(
+            l, w, palletType, woodType, topWidths, topThicknesses, bottomWidths, sc, sW, sH
+        );
 
         return {
             length: l, width: w, palletType, woodType, topDeckCount: tdc, bottomDeckCount: bdc, stringerCount: sc,
@@ -197,7 +250,8 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
             topDeckWidth: tW, topDeckThickness: tT, bottomDeckWidth: bW, bottomDeckThickness: bT,
             customBoardSize,
             topWidths, bottomWidths, topThicknesses, bottomThicknesses, ht, weightLbs, nailCount, overallHeight,
-            truckQty, topLeadWidth: tlw, topLeadThickness: tlt, bottomLeadWidth: blw, bottomLeadThickness: blt
+            truckQty, topLeadWidth: tlw, topLeadThickness: tlt, bottomLeadWidth: blw, bottomLeadThickness: blt,
+            dynamicLoadLbs, staticLoadLbs
         };
     };
 
@@ -727,6 +781,17 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
                              <div>{trim0(currentSpecs.stringerHeight)}"H x {trim0(currentSpecs.stringerWidth)}"W</div>
                          </td>
                      </tr>
+                     <tr className="border-b">
+                         <th className="px-4 py-3 bg-slate-50 font-semibold text-slate-600">Estimated Load Capacity</th>
+                         <td className="px-4 py-3 text-slate-800">
+                             <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                                 <div><span className="font-semibold text-[#004d3d]">Dynamic:</span> ~{currentSpecs.dynamicLoadLbs.toLocaleString()} lbs</div>
+                                 <div className="text-slate-300 hidden sm:inline">|</div>
+                                 <div><span className="font-semibold text-[#004d3d]">Static:</span> ~{currentSpecs.staticLoadLbs.toLocaleString()} lbs</div>
+                             </div>
+                             <div className="text-[11px] text-slate-500 mt-0.5">Forklift moving vs. floor storage (uniformly distributed load)</div>
+                         </td>
+                     </tr>
                      <tr>
                          <th className="px-4 py-3 bg-slate-50 font-semibold text-slate-600">Logistics Data</th>
                          <td className="px-4 py-3 text-slate-800 font-medium">
@@ -781,8 +846,12 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
                                      <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', fontSize: '11px', color: '#475569' }}>{currentSpecs.stringerCount} Stringers / {trim0(currentSpecs.stringerHeight)}"H x {trim0(currentSpecs.stringerWidth)}"W</td>
                                   </tr>
                                   <tr>
+                                     <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontWeight: 'bold', fontSize: '11px', color: '#334155' }}>Est. Load Capacity</td>
+                                     <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', fontSize: '11px', color: '#475569' }}>Dynamic: ~{currentSpecs.dynamicLoadLbs.toLocaleString()} lbs | Static: ~{currentSpecs.staticLoadLbs.toLocaleString()} lbs (UDL)</td>
+                                  </tr>
+                                  <tr>
                                      <td style={{ padding: '6px 16px', backgroundColor: '#f8fafc', fontWeight: 'bold', fontSize: '11px', color: '#334155' }}>Logistics</td>
-                                     <td style={{ padding: '6px 16px', fontSize: '11px', color: '#475569' }}>Est. Weight: {currentSpecs.weightLbs.toFixed(1)} lbs | Truck Capacity: {currentSpecs.truckQty}</td>
+                                     <td style={{ padding: '6px 16px', fontSize: '11px', color: '#475569' }}>Est. Weight: {currentSpecs.weightLbs.toFixed(1)} lbs | Truck Capacity: {currentSpecs.truckQty} Stacks</td>
                                   </tr>
                              </tbody>
                          </table>
