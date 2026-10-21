@@ -58,7 +58,7 @@ export function CustomPalletForm({ isAdvancedMode, specData, pdfDataUrl, onToggl
     useEffect(() => {
         if (isAdvancedMode && specData) {
             form.setValue('dimensions', `${specData.length} x ${specData.width} x ${specData.overallHeight.toFixed(1)}`);
-            let notes = `[Advanced Spec Attached]\nTop Decks: ${specData.topDeckCount}, Bottom: ${specData.bottomDeckCount}\nStringers: ${specData.stringerCount}\nTruck Qty: ${specData.truckQty}`;
+            let notes = `[Advanced Spec Attached]\nTop Decks: ${specData.topDeckCount}, Bottom: ${specData.bottomDeckCount}\nStringers: ${specData.stringerCount}\n53-ft Dry Van Estimate: ${specData.truckQty.toLocaleString()} empty pallets (616-baseline volume ratio; confirm trailer/loading constraints)`;
             notes += `\nTop Leads: ${specData.topLeadThickness}" x ${specData.topLeadWidth}" (Interior: ${specData.topDeckThickness}" x ${specData.topDeckWidth}")`;
             notes += `\nBot Leads: ${specData.bottomLeadThickness}" x ${specData.bottomLeadWidth}" (Interior: ${specData.bottomDeckThickness}" x ${specData.bottomDeckWidth}")`;
             if (specData.dynamicLoadLbs && specData.staticLoadLbs) {
@@ -77,6 +77,10 @@ export function CustomPalletForm({ isAdvancedMode, specData, pdfDataUrl, onToggl
             form.setValue('fileName', 'A3_Pallet_Spec_Sheet.pdf');
             form.setValue('fileType', 'application/pdf');
             form.setValue('fileData', pdfDataUrl.split(',')[1] || '');
+        } else if (form.getValues('fileName') === 'A3_Pallet_Spec_Sheet.pdf') {
+            form.setValue('fileName', '');
+            form.setValue('fileType', '');
+            form.setValue('fileData', '');
         }
     }, [pdfDataUrl, form]);
 

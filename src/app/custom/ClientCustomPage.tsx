@@ -11,19 +11,21 @@ export function ClientCustomPage() {
     const [isAdvancedMode, setIsAdvancedMode] = useState(false);
     const [specData, setSpecData] = useState<PalletSpecs | null>(null);
     const builderRef = useRef<BuilderRef>(null);
+    const specRevisionRef = useRef(0);
 
-    // This gets passed to the form child, which will call capturePDFDataUrl 
-    // when it's submitting, or we can proactively capture it.
-    // However, `html2canvas` is async. If the form relies on a sync value, we need to capture it ahead of time.
-    // Instead of sync, we let the form read `specData` and for the PDF, we capture it whenever specs change (debounced) or we've exposed `pdfDataUrl` as a prop.
     const [pdfDataUrl, setPdfDataUrl] = useState<string | null>(null);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
     const handleDownloadPdf = async () => {
         if (!builderRef.current) return;
+        const startRevision = specRevisionRef.current;
         setIsGeneratingPdf(true);
         try {
             const dataUrl = await builderRef.current.capturePDFDataUrl();
+            if (startRevision !== specRevisionRef.current) {
+                alert('The pallet specifications changed while the PDF was being generated. Please download it again.');
+                return;
+            }
             if (dataUrl) {
                 const res = await fetch(dataUrl);
                 const blob = await res.blob();
@@ -45,19 +47,19 @@ export function ClientCustomPage() {
         }
     };
 
-    const handleSpecChange = async (specs: PalletSpecs) => {
+    const handleSpecChange = (specs: PalletSpecs) => {
+        specRevisionRef.current += 1;
         setSpecData(specs);
+        setPdfDataUrl(null);
     };
 
-    // To prevent blocking the UI, we capture the PDF when the user clicks 'Submit' (inside the form). 
-    // Wait, the form doesn't know about `builderRef`.
-    // Let's proactively capture the PDF whenever they toggle advanced mode or after 2 seconds of inactivity? No, it's easier to capture when they click a snapshot button, or we can just capture it whenever specs change with a small debounce.
-    // Actually, capturing every time is expensive. Let's provide a wrapper function to the form to call onSubmit? The form expects `pdfDataUrl` synchronously. 
-    // Let's implement an on-demand generation in the form by wrapping the submit logic. But we can't easily change the form's deep internals without rewriting more.
-    // Alternative: since html2canvas takes ~100ms, let's just trigger it whenever specs change but debounce it by 1 second.
-    
-    // Simple state holding for now:
-    // When the user clicks the toggle, they enter advanced mode.
+    const handleToggleAdvanced = () => {
+        if (isAdvancedMode) {
+            specRevisionRef.current += 1;
+            setPdfDataUrl(null);
+        }
+        setIsAdvancedMode(!isAdvancedMode);
+    };
     
     return (
         <div className="container mx-auto py-16 px-4">
@@ -135,10 +137,15 @@ export function ClientCustomPage() {
                                 </button>
                                 <button 
                                     onClick={async () => {
+                                        const startRevision = specRevisionRef.current;
                                         setIsGeneratingPdf(true);
                                         try {
                                             if (builderRef.current) {
                                                 const dataUrl = await builderRef.current.capturePDFDataUrl();
+                                                if (startRevision !== specRevisionRef.current) {
+                                                    alert('The pallet specifications changed while the PDF was being generated. Please attach it again.');
+                                                    return;
+                                                }
                                                 if (dataUrl) {
                                                     setPdfDataUrl(dataUrl);
                                                     alert("A3 Pallet Spec Sheet successfully attached to your quote request!");
@@ -174,7 +181,7 @@ export function ClientCustomPage() {
                                     isAdvancedMode={isAdvancedMode} 
                                     specData={specData} 
                                     pdfDataUrl={pdfDataUrl}
-                                    onToggleAdvanced={() => setIsAdvancedMode(!isAdvancedMode)} 
+                                    onToggleAdvanced={handleToggleAdvanced}
                                 />
                             </div>
                         </CardContent>

@@ -4,8 +4,7 @@ import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } f
 import * as THREE from 'three';
 // @ts-ignore
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { toJpeg } from 'html-to-image';
-import { jsPDF } from 'jspdf';
+import { calculateDryVanCapacity, generatePalletSpecPdfDataUrl } from '@/lib/palletSpecPdf';
 
 export interface PalletSpecs {
     length: number;
@@ -48,7 +47,6 @@ interface Props {
     onChange?: (specs: PalletSpecs) => void;
 }
 
-const TRUCK = { length: 630, width: 98 };
 const WEIGHT_PER_BF: Record<string, number> = { New: 2.7, Recycled: 2.45 };
 const TOP_NAILS_PER_INTERSECTION = 2;
 const BOTTOM_NAILS_PER_INTERSECTION = 2;
@@ -74,12 +72,6 @@ function getBoardThicknesses(count: number, standardThickness: number, leadThick
     arr[count - 1] = leadThickness;
     return arr;
 }
-function computeTruckCount(width: number, length: number) {
-    const a = Math.floor(TRUCK.length / length) * Math.floor(TRUCK.width / width);
-    const b = Math.floor(TRUCK.length / width) * Math.floor(TRUCK.width / length);
-    return Math.max(a, b);
-}
-
 function computeLoadCapacity(
     length: number,
     width: number,
@@ -204,9 +196,13 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
     const topCanvasRef = useRef<HTMLCanvasElement>(null);
     const bottomCanvasRef = useRef<HTMLCanvasElement>(null);
     const sideCanvasRef = useRef<HTMLCanvasElement>(null);
-    
-    // For PDF extraction explicitly defined layout off-screen 
-    const pdfTemplateRef = useRef<HTMLDivElement>(null);
+    const pdfMetadataRef = useRef<{ documentId: string; generatedDate: Date } | null>(null);
+    if (!pdfMetadataRef.current) {
+        pdfMetadataRef.current = {
+            documentId: String(Math.floor(10000 + Math.random() * 90000)),
+            generatedDate: new Date(),
+        };
+    }
 
     const threeRef = useRef<{ scene?: THREE.Scene, camera?: THREE.PerspectiveCamera, renderer?: THREE.WebGLRenderer, group?: THREE.Group, reqId?: number }>({});
 
@@ -239,7 +235,7 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
         const weightLbs = totalBF * WEIGHT_PER_BF[woodType];
         const nailCount = (tdc * sc * TOP_NAILS_PER_INTERSECTION) + (bdc * sc * BOTTOM_NAILS_PER_INTERSECTION);
         const overallHeight = tT + sH + bT; // Sum of stringer and both deck thicknesses
-        const truckQty = computeTruckCount(w, l);
+        const truckQty = calculateDryVanCapacity(l, w, overallHeight).estimatedTotal;
         const { dynamicLoadLbs, staticLoadLbs } = computeLoadCapacity(
             l, w, palletType, woodType, topWidths, topThicknesses, bottomWidths, sc, sW, sH
         );
@@ -284,52 +280,10 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
 
     useImperativeHandle(ref, () => ({
         getSpecs: () => currentSpecs,
-        capturePDFDataUrl: async () => {
-             if (!pdfTemplateRef.current) return null;
-             
-             // Sync 2D Canvas drawings into the hidden PDF template images
-             if (topCanvasRef.current) {
-                 const img = document.getElementById('pdf-top-img') as HTMLImageElement;
-                 if (img) img.src = topCanvasRef.current.toDataURL('image/png', 1.0);
-             }
-             if (bottomCanvasRef.current) {
-                 const img = document.getElementById('pdf-bot-img') as HTMLImageElement;
-                 if (img) img.src = bottomCanvasRef.current.toDataURL('image/png', 1.0);
-             }
-             if (sideCanvasRef.current) {
-                 const img = document.getElementById('pdf-side-img') as HTMLImageElement;
-                 if (img) img.src = sideCanvasRef.current.toDataURL('image/png', 1.0);
-             }
-             
-             // Sync 3D Canvas
-             const threeCanvas = threeContainerRef.current?.querySelector('canvas');
-             if (threeCanvas) {
-                 const img = document.getElementById('pdf-3d-img') as HTMLImageElement;
-                 if (img) img.src = threeCanvas.toDataURL('image/png', 1.0); // PNG preserves transparency
-             }
-
-             // Give the browser DOM a tiny moment to flush and paint the new image sources
-             await new Promise(r => setTimeout(r, 150));
-
-             try {
-                 // Extract natively via HTML-to-Image (bypasses html2canvas css-parser errors like the 'lab' color bug)
-                 const imgData = await toJpeg(pdfTemplateRef.current, { quality: 0.85, pixelRatio: 2 });
-
-                 // Create pure PDF using jsPDF (Letter: 8.5 x 11 inch = 612 x 792 pt. In mm: 215.9 x 279.4)
-                 const pdf = new jsPDF('p', 'pt', 'letter');
-                 const pdfWidth = pdf.internal.pageSize.getWidth();
-                 const pdfHeight = (pdfTemplateRef.current.offsetHeight * pdfWidth) / pdfTemplateRef.current.offsetWidth;
-                 
-                 // Add image safely inside boundaries
-                 pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-                 
-                 return pdf.output('datauristring'); // Base64 'application/pdf'
-             } catch (error: any) {
-                 console.error("PDF Generation failed", error);
-                 alert("PDF Generation Error: " + (error.message || String(error)));
-                 return null;
-             }
-        }
+        capturePDFDataUrl: async () => generatePalletSpecPdfDataUrl(
+            currentSpecs,
+            pdfMetadataRef.current ?? undefined,
+        ),
     }));
 
     useEffect(() => {
@@ -795,7 +749,7 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
                      <tr>
                          <th className="px-4 py-3 bg-slate-50 font-semibold text-slate-600">Logistics Data</th>
                          <td className="px-4 py-3 text-slate-800 font-medium">
-                             Weight: ~{currentSpecs.weightLbs.toFixed(1)} lbs | Truck (53'): {currentSpecs.truckQty} Stacks
+                             Weight: ~{currentSpecs.weightLbs.toFixed(1)} lbs | 53&apos; Dry Van est.: {currentSpecs.truckQty.toLocaleString()} empty pallets (616-baseline volume ratio)
                          </td>
                      </tr>
                  </tbody>
@@ -805,81 +759,6 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
 
     return (
         <div className="flex flex-col gap-6 relative">
-            
-            {/* --- OFFFSCREEN LETTER STYLE PDF TEMPLATE (Strictly 8.5 x 11 aspect ratio ratio for html2canvas) --- */}
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '1px', height: '1px', overflow: 'hidden', pointerEvents: 'none', zIndex: -50 }}>
-                <div ref={pdfTemplateRef} style={{ width: '816px', height: '1056px', backgroundColor: 'white', padding: '40px', boxSizing: 'border-box', position: 'relative' }}>
-                    
-                    {/* Header */}
-                    <div style={{ borderBottom: `4px solid ${BRAND_COLOR}`, paddingBottom: '16px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                              <img src="/logo-a3-pallet.png" alt="A3 Pallet Logo" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
-                              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                   <p style={{ margin: '0 0 4px 0', color: '#475569', fontSize: '13px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Custom Pallet Spec Sheet</p>
-                                   <p style={{ margin: 0, color: BRAND_COLOR, fontSize: '12px', fontWeight: '600' }}>www.a3pallet.com</p>
-                              </div>
-                         </div>
-                         <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                              <p style={{ margin: '0 0 4px 0', color: '#334155', fontSize: '11px', fontWeight: '700' }}>DOCUMENT ID: #{Math.floor(Math.random() * 100000)}</p>
-                              <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '11px' }}>Generated: {new Date().toLocaleDateString()}</p>
-                              <p style={{ margin: 0, fontSize: '11px', color: '#475569', fontWeight: '600' }}>Heat Treated: <span style={{ color: currentSpecs.ht === 'Yes' ? BRAND_COLOR : '#64748b' }}>{currentSpecs.ht}</span></p>
-                         </div>
-                    </div>
-
-                    {/* Spec Table Native DOM for PDF */}
-                    <div style={{ marginBottom: '16px' }}>
-                         <div style={{ backgroundColor: BRAND_COLOR, color: 'white', padding: '6px 16px', fontWeight: 'bold', borderRadius: '6px 6px 0 0', fontSize: '12px' }}>
-                             {currentSpecs.length}" L x {currentSpecs.width}" W x {trim0(currentSpecs.overallHeight)}" H — {currentSpecs.palletType}
-                         </div>
-                         <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #e2e8f0', borderTop: 'none' }}>
-                             <tbody>
-                                  <tr>
-                                     <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', width: '25%', backgroundColor: '#f8fafc', fontWeight: 'bold', fontSize: '11px', color: '#334155' }}>Top Deck</td>
-                                     <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', fontSize: '11px', color: '#475569' }}>{currentSpecs.topDeckCount} Boards / {trim0(currentSpecs.topLeadThickness)}"x{trim0(currentSpecs.topLeadWidth)}" Leads / {trim0(currentSpecs.topDeckThickness)}"x{trim0(currentSpecs.topDeckWidth)}" Inner</td>
-                                  </tr>
-                                  <tr>
-                                     <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontWeight: 'bold', fontSize: '11px', color: '#334155' }}>Bottom Deck</td>
-                                     <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', fontSize: '11px', color: '#475569' }}>{currentSpecs.bottomDeckCount} Boards / {trim0(currentSpecs.bottomLeadThickness)}"x{trim0(currentSpecs.bottomLeadWidth)}" Leads / {trim0(currentSpecs.bottomDeckThickness)}"x{trim0(currentSpecs.bottomDeckWidth)}" Inner</td>
-                                  </tr>
-                                  <tr>
-                                     <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontWeight: 'bold', fontSize: '11px', color: '#334155' }}>Stringers/Blocks</td>
-                                     <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', fontSize: '11px', color: '#475569' }}>{currentSpecs.stringerCount} Stringers / {trim0(currentSpecs.stringerHeight)}"H x {trim0(currentSpecs.stringerWidth)}"W</td>
-                                  </tr>
-                                  <tr>
-                                     <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontWeight: 'bold', fontSize: '11px', color: '#334155' }}>Est. Load Capacity</td>
-                                     <td style={{ padding: '6px 16px', borderBottom: '1px solid #e2e8f0', fontSize: '11px', color: '#475569' }}>Dynamic: ~{currentSpecs.dynamicLoadLbs.toLocaleString()} lbs | Static: ~{currentSpecs.staticLoadLbs.toLocaleString()} lbs (UDL)</td>
-                                  </tr>
-                                  <tr>
-                                     <td style={{ padding: '6px 16px', backgroundColor: '#f8fafc', fontWeight: 'bold', fontSize: '11px', color: '#334155' }}>Logistics</td>
-                                     <td style={{ padding: '6px 16px', fontSize: '11px', color: '#475569' }}>Est. Weight: {currentSpecs.weightLbs.toFixed(1)} lbs | Truck Capacity: {currentSpecs.truckQty} Stacks</td>
-                                  </tr>
-                             </tbody>
-                         </table>
-                    </div>
-
-                    {/* 3D Visualization Map */}
-                    <div style={{ marginBottom: '16px', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px', textAlign: 'center', backgroundColor: '#ffffff' }}>
-                         <h4 style={{ margin: '0 0 8px 0', fontSize: '12px', color: BRAND_COLOR, fontWeight: '800', letterSpacing: '0.5px' }}>3D INTERACTIVE RENDER</h4>
-                         <img id="pdf-3d-img" style={{ height: '230px', width: 'auto', margin: '0 auto', display: 'block', objectFit: 'contain' }} alt="3D View" />
-                    </div>
-
-                    {/* 2D Grid Layout */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                         <div style={{ border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px' }}>
-                             <h4 style={{ margin: '0 0 8px 0', fontSize: '12px', color: BRAND_COLOR, fontWeight: '700' }}>TOP VIEW</h4>
-                             <img id="pdf-top-img" style={{ width: '100%', height: '190px', objectFit: 'contain' }} alt="Top" />
-                         </div>
-                         <div style={{ border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px' }}>
-                             <h4 style={{ margin: '0 0 8px 0', fontSize: '12px', color: BRAND_COLOR, fontWeight: '700' }}>BOTTOM VIEW</h4>
-                             <img id="pdf-bot-img" style={{ width: '100%', height: '190px', objectFit: 'contain' }} alt="Bottom" />
-                         </div>
-                         <div style={{ gridColumn: 'span 2', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px', textAlign: 'center' }}>
-                             <h4 style={{ margin: '0 0 8px 0', fontSize: '12px', color: BRAND_COLOR, fontWeight: '700', textAlign: 'left' }}>SIDE PROFILE VIEW</h4>
-                             <img id="pdf-side-img" style={{ width: '60%', height: '110px', objectFit: 'contain', margin: '0 auto', display: 'block' }} alt="Side" />
-                         </div>
-                    </div>
-                </div>
-            </div>
 
             {/* --- VISUAL UI PORTION --- */}
             <InputSection />
