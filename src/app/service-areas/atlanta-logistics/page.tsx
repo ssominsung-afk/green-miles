@@ -249,7 +249,7 @@ export default function AtlantaLogisticsPage() {
                         "image": "https://a3pallet.com/logo.png",
                         "@id": "https://a3pallet.com",
                         "url": "https://a3pallet.com",
-                        "telephone": "(404) 555-0123",
+                        "telephone": "(470) 962-7000",
                         "address": {
                             "@type": "PostalAddress",
                             "addressLocality": "Atlanta",
