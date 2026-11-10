@@ -268,7 +268,7 @@ function DecimalInput({ value, onChange, step, className, placeholder, presets }
                     }
                     e.currentTarget.value = '';
                 }}
-                className="w-24 shrink-0 rounded border border-slate-300 bg-white px-1.5 text-xs text-slate-700 focus:border-[#004d3d] focus:ring-[#004d3d]"
+                className="w-20 shrink-0 rounded border border-slate-300 bg-white px-1 text-[10px] text-slate-700 focus:border-[#004d3d] focus:ring-[#004d3d]"
             >
                 <option value="">Presets</option>
                 {presets.map(option => (
