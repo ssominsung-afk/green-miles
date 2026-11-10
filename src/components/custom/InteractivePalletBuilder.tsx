@@ -53,9 +53,9 @@ interface Props {
 
 const WEIGHT_PER_BF: Record<string, number> = { New: 2.7, Recycled: 2.45 };
 
-// Frequently-used specs from the A3 Pallet spec sheet. Offered as dropdown
-// suggestions (datalist comboboxes) on the numeric inputs below - users can
-// still type any custom number; presets never clamp or restrict input.
+// Frequently-used specs from the A3 Pallet spec sheet. Each numeric field
+// has a real preset dropdown plus a free-form text input, so presets work
+// consistently across Chrome, Safari, and mobile browsers.
 const PRESET_LENGTHS = [48];
 const PRESET_WIDTHS = [40, 50];
 const PRESET_BOARD_WIDTHS = [4, 6];
@@ -63,6 +63,17 @@ const PRESET_BOARD_THICKNESSES: { value: number; label: string }[] = [
     { value: 0.5, label: '1/2"' },
     { value: 0.6875, label: '11/16"' },
 ];
+const PRESET_TOP_DECK_COUNTS = [3, 4, 5, 6, 7, 8];
+const PRESET_BOTTOM_DECK_COUNTS = [3, 4, 5, 6];
+const PRESET_STRINGER_COUNTS = [2, 3, 4, 5];
+
+const PRESET_LENGTH_OPTIONS = PRESET_LENGTHS.map(value => ({ value, label: `${value}"` }));
+const PRESET_WIDTH_OPTIONS = PRESET_WIDTHS.map(value => ({ value, label: `${value}"` }));
+const PRESET_BOARD_WIDTH_OPTIONS = PRESET_BOARD_WIDTHS.map(value => ({ value, label: `${value}" wide` }));
+const PRESET_THICKNESS_OPTIONS = PRESET_BOARD_THICKNESSES;
+const PRESET_TOP_DECK_OPTIONS = PRESET_TOP_DECK_COUNTS.map(value => ({ value, label: `${value} boards` }));
+const PRESET_BOTTOM_DECK_OPTIONS = PRESET_BOTTOM_DECK_COUNTS.map(value => ({ value, label: `${value} boards` }));
+const PRESET_STRINGER_OPTIONS = PRESET_STRINGER_COUNTS.map(value => ({ value, label: `${value} stringers` }));
 
 // Grades from the spec sheet. Grade A / Grade B are recycled-pallet grades,
 // so they use the recycled material factor; New Premium (HT/KD) is new lumber
@@ -195,20 +206,20 @@ function resizeCanvas(canvas: HTMLCanvasElement) {
 // normalized to the numeric value. External numeric changes (datalist preset,
 // Split Top/Bottom sync) overwrite the text. Defined at module level so its
 // identity (and its text state / focus) survives parent re-renders.
-function DecimalInput({ value, onChange, list, step, className, placeholder }: {
+type PresetOption = { value: number; label: string };
+
+// Text-backed numeric input with a browser-independent preset selector.
+// Users can always type arbitrary numbers, including in-progress decimals.
+function DecimalInput({ value, onChange, step, className, placeholder, presets }: {
     value: number;
     onChange: (n: number) => void;
-    list?: string;
     step?: string;
     className?: string;
     placeholder?: string;
+    presets?: PresetOption[];
 }) {
     const [text, setText] = useState(() => String(value));
 
-    // Sync the displayed text when the numeric value changes from outside.
-    // While typing, the parsed text already equals the value, so typing is
-    // never clobbered. Runs on value changes only (not on text) so an
-    // in-progress entry like "." is not wiped while typing.
     useEffect(() => {
         const parsed = Number(text);
         if (!Number.isFinite(parsed) || parsed !== value) {
@@ -217,12 +228,16 @@ function DecimalInput({ value, onChange, list, step, className, placeholder }: {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value]);
 
-    return (
+    const inputClassName = [
+        presets?.length ? 'min-w-0 flex-1' : '',
+        className?.replace(/\bw-full\b/g, ''),
+    ].filter(Boolean).join(' ');
+
+    const input = (
         <input
             type="text"
             inputMode="decimal"
             step={step}
-            list={list}
             value={text}
             onChange={e => {
                 const raw = e.target.value;
@@ -232,9 +247,35 @@ function DecimalInput({ value, onChange, list, step, className, placeholder }: {
                 if (Number.isFinite(n)) onChange(n);
             }}
             onBlur={() => { if (Number.isFinite(value)) setText(String(value)); }}
-            className={className}
+            className={inputClassName}
             placeholder={placeholder}
         />
+    );
+
+    if (!presets?.length) return input;
+
+    return (
+        <div className="flex min-w-0 items-stretch gap-1">
+            {input}
+            <select
+                aria-label="Common presets"
+                defaultValue=""
+                onChange={e => {
+                    const option = presets.find(p => String(p.value) === e.target.value);
+                    if (option) {
+                        setText(String(option.value));
+                        onChange(option.value);
+                    }
+                    e.currentTarget.value = '';
+                }}
+                className="w-24 shrink-0 rounded border border-slate-300 bg-white px-1.5 text-xs text-slate-700 focus:border-[#004d3d] focus:ring-[#004d3d]"
+            >
+                <option value="">Presets</option>
+                {presets.map(option => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+            </select>
+        </div>
     );
 }
 
@@ -654,34 +695,14 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
 
     const InputSection = () => (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-4 border rounded-xl bg-white text-sm">
-            {/* Frequently-used spec presets: pick from the dropdown or type any custom number */}
-            <datalist id="builder-length-presets">
-                {PRESET_LENGTHS.map((v) => (
-                    <option key={v} value={v} label={`${v}"`} />
-                ))}
-            </datalist>
-            <datalist id="builder-width-presets">
-                {PRESET_WIDTHS.map((v) => (
-                    <option key={v} value={v} label={`${v}"`} />
-                ))}
-            </datalist>
-            <datalist id="builder-board-width-presets">
-                {PRESET_BOARD_WIDTHS.map((v) => (
-                    <option key={v} value={v} label={`${v}" wide`} />
-                ))}
-            </datalist>
-            <datalist id="builder-board-thickness-presets">
-                {PRESET_BOARD_THICKNESSES.map((t) => (
-                    <option key={t.value} value={t.value} label={`${t.label} thick`} />
-                ))}
-            </datalist>
+
             <div className="space-y-1">
                 <label className="font-semibold text-slate-800">Length (in)</label>
-                <DecimalInput value={length} onChange={setLength} list="builder-length-presets" className="w-full p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d]" />
+                <DecimalInput value={length} onChange={setLength} presets={PRESET_LENGTH_OPTIONS} className="w-full p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d]" />
             </div>
             <div className="space-y-1">
                 <label className="font-semibold text-slate-800">Width (in)</label>
-                <DecimalInput value={width} onChange={setWidth} list="builder-width-presets" className="w-full p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d]" />
+                <DecimalInput value={width} onChange={setWidth} presets={PRESET_WIDTH_OPTIONS} className="w-full p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d]" />
             </div>
             <div className="space-y-1">
                 <label className="font-semibold text-slate-800">Pallet Type</label>
@@ -703,15 +724,15 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
             </div>
             <div className="space-y-1">
                 <label className="font-semibold text-slate-800">Top Decks</label>
-                <input type="number" value={topDeckCount} onChange={e => setTopDeckCount(Number(e.target.value))} className="w-full p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d]" />
+                <DecimalInput value={topDeckCount} onChange={setTopDeckCount} presets={PRESET_TOP_DECK_OPTIONS} className="w-full p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d]" />
             </div>
             <div className="space-y-1">
                 <label className="font-semibold text-slate-800">Bottom Decks</label>
-                <input type="number" value={bottomDeckCount} onChange={e => setBottomDeckCount(Number(e.target.value))} className="w-full p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d]" />
+                <DecimalInput value={bottomDeckCount} onChange={setBottomDeckCount} presets={PRESET_BOTTOM_DECK_OPTIONS} className="w-full p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d]" />
             </div>
             <div className="space-y-1">
                 <label className="font-semibold text-slate-800">Stringers</label>
-                <input type="number" value={stringerCount} onChange={e => setStringerCount(Number(e.target.value))} className="w-full p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d]" />
+                <DecimalInput value={stringerCount} onChange={setStringerCount} presets={PRESET_STRINGER_OPTIONS} className="w-full p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d]" />
             </div>
             <div className="space-y-1">
                  <label className="font-semibold text-slate-800">Heat Treated</label>
@@ -733,14 +754,14 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                     <DecimalInput
-                        step="0.25" list="builder-board-width-presets"
+                        step="0.25" presets={PRESET_BOARD_WIDTH_OPTIONS}
                         value={topDeckWidth}
                         onChange={syncStdWidth}
                         className="p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d] bg-white"
                         placeholder="Width"
                     />
                     <DecimalInput
-                        step="0.125" list="builder-board-thickness-presets"
+                        step="0.125" presets={PRESET_THICKNESS_OPTIONS}
                         value={topDeckThickness}
                         onChange={syncStdThickness}
                         className="p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d] bg-white"
@@ -751,13 +772,13 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
                     <div className="pt-2 mt-2 border-t border-slate-200 grid grid-cols-1 gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
                         <div className="grid grid-cols-4 items-center gap-2">
                             <span className="text-[10px] font-bold text-slate-400 uppercase">Top</span>
-                            <DecimalInput step="0.25" list="builder-board-width-presets" value={topDeckWidth} onChange={setTopDeckWidth} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded" />
-                            <DecimalInput step="0.125" list="builder-board-thickness-presets" value={topDeckThickness} onChange={setTopDeckThickness} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded" />
+                            <DecimalInput step="0.25" presets={PRESET_BOARD_WIDTH_OPTIONS} value={topDeckWidth} onChange={setTopDeckWidth} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded" />
+                            <DecimalInput step="0.125" presets={PRESET_THICKNESS_OPTIONS} value={topDeckThickness} onChange={setTopDeckThickness} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded" />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-2">
                             <span className="text-[10px] font-bold text-slate-400 uppercase">Bot</span>
-                            <DecimalInput step="0.25" list="builder-board-width-presets" value={bottomDeckWidth} onChange={setBottomDeckWidth} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded" />
-                            <DecimalInput step="0.125" list="builder-board-thickness-presets" value={bottomDeckThickness} onChange={setBottomDeckThickness} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded" />
+                            <DecimalInput step="0.25" presets={PRESET_BOARD_WIDTH_OPTIONS} value={bottomDeckWidth} onChange={setBottomDeckWidth} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded" />
+                            <DecimalInput step="0.125" presets={PRESET_THICKNESS_OPTIONS} value={bottomDeckThickness} onChange={setBottomDeckThickness} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded" />
                         </div>
                     </div>
                 )}
@@ -776,14 +797,14 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                     <DecimalInput
-                        step="0.25" list="builder-board-width-presets"
+                        step="0.25" presets={PRESET_BOARD_WIDTH_OPTIONS}
                         value={topLeadWidth}
                         onChange={syncLeadWidth}
                         className="p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d] bg-white italic"
                         placeholder="Width"
                     />
                     <DecimalInput
-                        step="0.125" list="builder-board-thickness-presets"
+                        step="0.125" presets={PRESET_THICKNESS_OPTIONS}
                         value={topLeadThickness}
                         onChange={syncLeadThickness}
                         className="p-2 border border-slate-300 rounded focus:ring-[#004d3d] focus:border-[#004d3d] bg-white italic"
@@ -794,13 +815,13 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
                     <div className="pt-2 mt-2 border-t border-slate-200 grid grid-cols-1 gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
                         <div className="grid grid-cols-4 items-center gap-2">
                             <span className="text-[10px] font-bold text-slate-400 uppercase">Top</span>
-                            <DecimalInput step="0.25" list="builder-board-width-presets" value={topLeadWidth} onChange={n => { setTopLeadWidth(n); setTopLeadSDirty(true); }} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded italic" />
-                            <DecimalInput step="0.125" list="builder-board-thickness-presets" value={topLeadThickness} onChange={n => { setTopLeadThickness(n); setTopLeadTDirty(true); }} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded italic" />
+                            <DecimalInput step="0.25" presets={PRESET_BOARD_WIDTH_OPTIONS} value={topLeadWidth} onChange={n => { setTopLeadWidth(n); setTopLeadSDirty(true); }} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded italic" />
+                            <DecimalInput step="0.125" presets={PRESET_THICKNESS_OPTIONS} value={topLeadThickness} onChange={n => { setTopLeadThickness(n); setTopLeadTDirty(true); }} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded italic" />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-2">
                             <span className="text-[10px] font-bold text-slate-400 uppercase">Bot</span>
-                            <DecimalInput step="0.25" list="builder-board-width-presets" value={bottomLeadWidth} onChange={n => { setBottomLeadWidth(n); setBottomLeadSDirty(true); }} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded italic" />
-                            <DecimalInput step="0.125" list="builder-board-thickness-presets" value={bottomLeadThickness} onChange={n => { setBottomLeadThickness(n); setBottomLeadTDirty(true); }} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded italic" />
+                            <DecimalInput step="0.25" presets={PRESET_BOARD_WIDTH_OPTIONS} value={bottomLeadWidth} onChange={n => { setBottomLeadWidth(n); setBottomLeadSDirty(true); }} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded italic" />
+                            <DecimalInput step="0.125" presets={PRESET_THICKNESS_OPTIONS} value={bottomLeadThickness} onChange={n => { setBottomLeadThickness(n); setBottomLeadTDirty(true); }} className="col-span-1.5 p-1 text-xs border border-slate-200 rounded italic" />
                         </div>
                     </div>
                 )}
