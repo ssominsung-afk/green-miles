@@ -255,7 +255,7 @@ function DecimalInput({ value, onChange, step, className, placeholder, presets }
     if (!presets?.length) return input;
 
     return (
-        <div className="flex min-w-0 items-stretch gap-1">
+        <div className="flex w-full min-w-0 items-stretch gap-1">
             {input}
             <select
                 aria-label="Common presets"
