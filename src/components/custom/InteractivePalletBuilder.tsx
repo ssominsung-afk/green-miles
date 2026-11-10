@@ -694,7 +694,7 @@ export const InteractivePalletBuilder = forwardRef<BuilderRef, Props>(({ onChang
     }, [currentSpecs]);
 
     const InputSection = () => (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-4 border rounded-xl bg-white text-sm">
+        <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 p-4 border rounded-xl bg-white text-sm">
 
             <div className="space-y-1">
                 <label className="font-semibold text-slate-800">Length (in)</label>
