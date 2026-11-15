@@ -9,9 +9,6 @@ import GTMClickTracker from "@/components/analytics/GTMClickTracker";
 
 const inter = Inter({ subsets: ["latin"] });
 
-// ✅ GA4 Measurement ID
-const GA_ID = "G-N8P6KWL7LW";
-
 export const metadata: Metadata = {
   title: {
     default: "A3 Pallet | Reliable Pallet Supply & Sourcing Partner Southeast",
@@ -93,24 +90,6 @@ export default function RootLayout({
             })(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM_ID || 'GTM-N84F5R4B'}');
           `}
         </Script>
-
-        {/* ✅ GA4 (있을 때만 실행) */}
-        {GA_ID ? (
-          <>
-            <Script
-              strategy="afterInteractive"
-              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-            />
-            <Script id="ga4" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${GA_ID}');
-              `}
-            </Script>
-          </>
-        ) : null}
 
         <noscript>
           <iframe
