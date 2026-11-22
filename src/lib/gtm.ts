@@ -4,6 +4,7 @@
 declare global {
     interface Window {
         dataLayer: any[];
+        gtag?: (...args: any[]) => void;
     }
 }
 
@@ -11,6 +12,11 @@ export const pushToDataLayer = (data: any) => {
     if (typeof window !== 'undefined') {
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push(data);
+
+        if (typeof window.gtag === 'function' && typeof data.event === 'string') {
+            const { event, ...params } = data;
+            window.gtag('event', event, params);
+        }
     }
 };
 
