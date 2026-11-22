@@ -11,8 +11,7 @@ export default function GaDebugPaxPage() {
         const w = window as unknown as Record<string, unknown>;
         const resources = performance
           .getEntriesByType('resource')
-          .map((e) => e.name)
-          .filter((n) => n.includes('googletagmanager') || n.includes('google-analytics'));
+          .map((e) => e.name);
         const data = {
           title: document.title,
           gtagType: typeof w.gtag,
