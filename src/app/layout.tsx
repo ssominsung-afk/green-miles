@@ -8,7 +8,7 @@ import Footer from "@/components/layout/Footer";
 import GTMClickTracker from "@/components/analytics/GTMClickTracker";
 
 const inter = Inter({ subsets: ["latin"] });
-const GA_MEASUREMENT_ID = "G-M1JE4DPR5G";
+const GA_MEASUREMENT_ID = "G-EESKP784Z0";
 
 export const metadata: Metadata = {
   title: {
